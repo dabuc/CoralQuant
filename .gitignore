@@ -127,3 +127,19 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#----------自定义------------
+coralquant-venv/
+*.csv
+*.vscode
+.DS_Store
+*.log
+logs/*.log.*
+spider.db
+!.gitkeep
+data/
+*.code-workspace
+test/
+etl.sql
+deploy.md
+test.py
