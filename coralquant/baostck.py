@@ -17,7 +17,7 @@ def get_task_list():
     获取股票列表
     """
     s = select([stock_basic.c.ts_code
-                ]).where(stock_basic.c.list_status == 'L').limit(2)
+                ]).where(stock_basic.c.list_status == 'L')
     rp = connection.execute(s)
     task_list = []
     for row in rp:
