@@ -3,21 +3,22 @@
 import os, sys
 from dotenv import load_dotenv
 load_dotenv()
-base_dir = os.path.dirname(os.path.realpath(__file__))
+base_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 class BaseConfig():
     """
     基本配置类
     """
+    IDB_DEBUG = '0'
     DATABASE_URL = os.getenv("DATABASE_URL",'')
     TUSHARE_TOKEN= os.getenv("TUSHARE_TOKEN",'')
-
+    LOG_PATH=os.getenv("LOG_PATH",base_dir+'/logs/coralquant.log')
 
 class DevelopmentConfig(BaseConfig):
     """
     开发配置类
     """
-    pass
+    IDB_DEBUG = '1'
 
 class ProductionConfig(BaseConfig):
     """
