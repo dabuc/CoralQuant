@@ -45,7 +45,7 @@ def import_data():
     metadata = MetaData()
     connection = engine.connect()
     tmp = Table('tmp_history_A_stock_k_data', metadata, autoload=True, autoload_with=engine)
-    result = engine.execute(select([tmp])).fetchall()
+    result = engine.execute(select([tmp]))
     daily_k_data_list = []
     step = 0
     ins = daily_k_data.insert()
