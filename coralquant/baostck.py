@@ -1,3 +1,4 @@
+from datetime import datetime
 import random
 import time
 
@@ -12,12 +13,12 @@ from coralquant.settings import CQ_Config
 engine = create_engine(CQ_Config.DATABASE_URL)
 connection = engine.connect()
 
+
 def get_task_list():
     """
     获取股票列表
     """
-    s = select([stock_basic.c.ts_code
-                ]).where(stock_basic.c.list_status == 'L')
+    s = select([stock_basic.c.ts_code]).where(stock_basic.c.list_status == 'L')
     rp = connection.execute(s)
     task_list = []
     for row in rp:
@@ -29,9 +30,13 @@ def get_task_list():
     return task_list
 
 
-def init_history_k_data_plus():
+def init_history_k_data_plus(frequency,
+                             table_name,
+                             start_date='1990-12-19',
+                             end_date=datetime.now().strftime("%Y-%m-%d"),
+                             adjustflag="3"):
     """
-    初始化日线数据
+    初始化历史K线数据
     """
     _logger = logger.Logger(__name__).get_log()
 
@@ -41,8 +46,24 @@ def init_history_k_data_plus():
     _logger.info("login respond error_code:" + lg.error_code)
     _logger.info("login respond  error_msg:" + lg.error_msg)
 
+    d_fields="date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,peTTM,pbMRQ,psTTM,pcfNcfTTM,isST",
+    w_m_fields='date,code,open,high,low,close,volume,amount,adjustflag,turn,pctChg'
+    min_fields='date,time,code,open,high,low,close,volume,amount,adjustflag'
 
-    task_list= get_task_list()
+    frequency_fields={
+        'd':d_fields,
+        'w':w_m_fields,
+        'm':w_m_fields,
+        '5':min_fields,
+        '15':min_fields,
+        '30':min_fields,
+        '60':min_fields
+    }
+
+    fields=frequency_fields[frequency]
+
+
+    task_list = get_task_list()
     step = 1
     for task in task_list:
         try:
@@ -56,16 +77,16 @@ def init_history_k_data_plus():
             # 详细指标参数，参见“历史行情指标参数”章节
             rs = bs.query_history_k_data_plus(
                 task[0],
-                "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,peTTM,pbMRQ,psTTM,pcfNcfTTM,isST",
-                start_date='1990-12-19',
-                end_date='2020-10-11',
-                frequency="d",
-                adjustflag="3",
+                fields,
+                start_date=start_date,
+                end_date=end_date,
+                frequency=frequency,
+                adjustflag=adjustflag,
             )  # frequency="d"取日k线，adjustflag="3"默认不复权
             _logger.info("query_history_k_data_plus respond error_code:" +
-                        rs.error_code)
+                         rs.error_code)
             _logger.info("query_history_k_data_plus respond  error_msg:" +
-                        rs.error_msg)
+                         rs.error_msg)
 
             #### 打印结果集 ####
             data_list = []
@@ -73,12 +94,12 @@ def init_history_k_data_plus():
                 # 获取一条记录，将记录合并在一起
                 data_list.append(rs.get_row_data())
             result = pd.DataFrame(data_list, columns=rs.fields)
-            
-            result.to_sql('tmp_history_A_stock_k_data',
-                        connection,
-                        schema='stock_dw',
-                        if_exists='replace' if step == 1 else 'append',
-                        index=False)
+
+            result.to_sql(table_name,
+                          connection,
+                          schema='stock_dw',
+                          if_exists='replace' if step == 1 else 'append',
+                          index=False)
             step += 1
         except Exception as e:
             _logger.error("{}下载失败,no.{}".format(task[0], step))
