@@ -3,7 +3,7 @@
 操作数据层数据模型，用于保存原始数据
 """
 from sqlalchemy import MetaData
-from sqlalchemy import Table, Column, Integer, Numeric, String, Enum, Float, Boolean,Date
+from sqlalchemy import Table, Column, Integer, BigInteger, Numeric, String, Enum, Float, Boolean, Date
 
 odl_metadata = MetaData()
 
@@ -36,7 +36,7 @@ daily_k_data = Table(
     Column('low', Numeric(12, 4), nullable=False),  #最低价
     Column('close', Numeric(12, 4), nullable=False),  #今收盘价
     Column('preclose', Numeric(12, 4), nullable=False),  #昨日收盘价
-    Column('volume', Integer, nullable=False),  #成交数量
+    Column('volume', BigInteger, nullable=False),  #成交数量
     Column('amount', Numeric(23, 4), nullable=False),  #成交金额
     Column('adjustflag', Enum('1', '2', '3'), nullable=False),  #复权状态
     Column('turn', Float, nullable=False),  #换手率
@@ -48,7 +48,6 @@ daily_k_data = Table(
     Column('pcfNcfTTM', Float, nullable=False),  #市净率
     Column('isST', Boolean, nullable=False)  #是否ST
 )
-
 
 if __name__ == "__main__":
     pass
