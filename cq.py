@@ -3,6 +3,7 @@
 import click
 from coralquant.stock_basic import get_stock_basic
 from coralquant import baostck
+from coralquant.etl import import_daily_k_data
 
 @click.group()
 def cli():
@@ -41,6 +42,14 @@ def init_m_history_k_data_plus():
     baostck.init_history_k_data_plus('w','tmp_m_history_A_stock_k_data')
     click.echo("月线数据初始化完成。")
 
+
+@cli.command()
+def import_daily_data():
+    """导入ODL日线数据
+    """
+    click.confirm("正在导入日线数据，是否继续？", abort=True)
+    import_daily_k_data.import_data()
+    click.echo("ODL日线数据导入完成。")
 
 def main():
     cli()
