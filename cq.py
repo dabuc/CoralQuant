@@ -33,6 +33,13 @@ def init_w_history_k_data_plus():
     baostck.init_history_k_data_plus('w','tmp_w_history_A_stock_k_data')
     click.echo("周线线数据初始化完成。")
 
+@cli.command()
+def init_m_history_k_data_plus():
+    """初始化月线数据
+    """
+    click.confirm("正在初始化月线数据，是否继续？", abort=True)
+    baostck.init_history_k_data_plus('w','tmp_m_history_A_stock_k_data')
+    click.echo("月线数据初始化完成。")
 
 
 def main():

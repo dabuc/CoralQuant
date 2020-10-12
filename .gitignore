@@ -140,6 +140,6 @@ spider.db
 data/
 *.code-workspace
 test/
-etl.sql
 deploy.md
 test.py
+*.sql
