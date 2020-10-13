@@ -2,7 +2,7 @@
 """数据仓库管理工具"""
 import click
 from sqlalchemy import create_engine
-from coralquant.models import metadata
+from coralquant.models import metadata, bdl_model, odl_model
 from coralquant.settings import CQ_Config
 
 
@@ -31,8 +31,8 @@ def dim():
 
 
 @odl.command()
-def create_odl():
-    """创建操作数据层数据表
+def create_dw():
+    """创建数据仓库
     """
     click.confirm("正在创建操作数据层数据表，是否继续？", abort=True)
 
