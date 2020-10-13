@@ -32,7 +32,8 @@ def dim():
 
 @odl.command()
 def create_odl():
-
+    """创建操作数据层数据表
+    """
     click.confirm("正在创建操作数据层数据表，是否继续？", abort=True)
 
     engine = create_engine(CQ_Config.DATABASE_URL)
