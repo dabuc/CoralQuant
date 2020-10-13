@@ -2,14 +2,13 @@
 """
 操作数据层数据模型，用于保存原始数据
 """
-from sqlalchemy import MetaData
 from sqlalchemy import Table, Column, Integer, BigInteger, Numeric, String, Enum, Float, Boolean, Date
+from coralquant.models import metadata
 
-odl_metadata = MetaData()
 
 stock_basic = Table(
     "odl_ts_stock_basic",
-    odl_metadata,
+    metadata,
     Column("ts_code", String(10)),  # TS代码
     Column("symbol", String(6), primary_key=True),  # 股票代码
     Column("name", String(10)),  # 股票名称
@@ -24,63 +23,6 @@ stock_basic = Table(
     Column("list_date", String(8)),  # 上市日期
     Column("delist_date", String(8)),  # 退市日期
     Column("is_hs", String(1), nullable=False),  # 是否沪深港通标的，N否 H沪股通 S深股通
-)
-
-daily_k_data = Table(
-    "odl_bs_daily_k_data",
-    odl_metadata,
-    Column('date', Date, nullable=False),  #交易所行情日期	
-    Column('code', String(10), nullable=False),  #证券代码
-    Column('open', Numeric(12, 4), nullable=False),  #今开盘价格
-    Column('high', Numeric(12, 4), nullable=False),  #最高价
-    Column('low', Numeric(12, 4), nullable=False),  #最低价
-    Column('close', Numeric(12, 4), nullable=False),  #今收盘价
-    Column('preclose', Numeric(12, 4), nullable=False),  #昨日收盘价
-    Column('volume', BigInteger, nullable=False),  #成交数量
-    Column('amount', Numeric(23, 4), nullable=False),  #成交金额
-    Column('adjustflag', Enum('1', '2', '3'), nullable=False),  #复权状态
-    Column('turn', Float, nullable=False),  #换手率
-    Column('tradestatus', Boolean, nullable=False),  #交易状态
-    Column('pctChg', Float, nullable=False),  #涨跌幅（百分比）
-    Column('peTTM', Float, nullable=False),  #滚动市盈率
-    Column('pbMRQ', Float, nullable=False),  #滚动市销率
-    Column('psTTM', Float, nullable=False),  #滚动市现率
-    Column('pcfNcfTTM', Float, nullable=False),  #市净率
-    Column('isST', Boolean, nullable=False)  #是否ST
-)
-
-w_m_fields = 'date,code,open,high,low,close,volume,amount,adjustflag,turn,pctChg'
-
-weekly_k_data = Table(
-    "odl_bs_weekly_k_data",
-    odl_metadata,
-    Column('date', Date, nullable=False),  #交易所行情日期	
-    Column('code', String(10), nullable=False),  #证券代码
-    Column('open', Numeric(12, 4), nullable=False),  #今开盘价格
-    Column('high', Numeric(12, 4), nullable=False),  #最高价
-    Column('low', Numeric(12, 4), nullable=False),  #最低价
-    Column('close', Numeric(12, 4), nullable=False),  #今收盘价
-    Column('volume', BigInteger, nullable=False),  #成交数量
-    Column('amount', Numeric(23, 4), nullable=False),  #成交金额
-    Column('adjustflag', Enum('1', '2', '3'), nullable=False),  #复权状态
-    Column('turn', Float, nullable=False),  #换手率
-    Column('pctChg', Float, nullable=False),  #涨跌幅（百分比）
-)
-
-monthly_k_data = Table(
-    "odl_bs_monthly_k_data",
-    odl_metadata,
-    Column('date', Date, nullable=False),  #交易所行情日期	
-    Column('code', String(10), nullable=False),  #证券代码
-    Column('open', Numeric(12, 4), nullable=False),  #今开盘价格
-    Column('high', Numeric(12, 4), nullable=False),  #最高价
-    Column('low', Numeric(12, 4), nullable=False),  #最低价
-    Column('close', Numeric(12, 4), nullable=False),  #今收盘价
-    Column('volume', BigInteger, nullable=False),  #成交数量
-    Column('amount', Numeric(23, 4), nullable=False),  #成交金额
-    Column('adjustflag', Enum('1', '2', '3'), nullable=False),  #复权状态
-    Column('turn', Float, nullable=False),  #换手率
-    Column('pctChg', Float, nullable=False),  #涨跌幅（百分比）
 )
 
 

@@ -2,7 +2,7 @@
 """数据仓库管理工具"""
 import click
 from sqlalchemy import create_engine
-from coralquant.models.odl_model import odl_metadata
+from coralquant.models import metadata
 from coralquant.settings import CQ_Config
 
 
@@ -37,7 +37,7 @@ def create_odl():
     click.confirm("正在创建操作数据层数据表，是否继续？", abort=True)
 
     engine = create_engine(CQ_Config.DATABASE_URL)
-    odl_metadata.create_all(engine)
+    metadata.create_all(engine)
     click.echo("数据层数据表创建完成")
 
 

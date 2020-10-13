@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """命令工具"""
-from coralquant.etl import import_wm_k_data
+from coralquant.etl import bdl_import_k_data
 import click
 from coralquant.stock_basic import get_stock_basic
 from coralquant import baostck
-from coralquant.etl import import_daily_k_data
 
 
 @click.group()
@@ -26,7 +25,7 @@ def init_d_history_k_data_plus():
     """初始化日线数据
     """
     click.confirm("正在初始化日线数据，是否继续？", abort=True)
-    baostck.init_history_k_data_plus('d', 'tmp_history_A_stock_k_data')
+    baostck.init_history_k_data_plus('d', 'odl_history_A_stock_k_data')
     click.echo("日线数据初始化完成。")
 
 
@@ -35,7 +34,7 @@ def init_w_history_k_data_plus():
     """初始化周线数据
     """
     click.confirm("正在初始化周线数据，是否继续？", abort=True)
-    baostck.init_history_k_data_plus('w', 'tmp_w_history_A_stock_k_data')
+    baostck.init_history_k_data_plus('w', 'odl_w_history_A_stock_k_data')
     click.echo("周线线数据初始化完成。")
 
 
@@ -44,26 +43,17 @@ def init_m_history_k_data_plus():
     """初始化月线数据
     """
     click.confirm("正在初始化月线数据，是否继续？", abort=True)
-    baostck.init_history_k_data_plus('w', 'tmp_m_history_A_stock_k_data')
+    baostck.init_history_k_data_plus('w', 'odl_m_history_A_stock_k_data')
     click.echo("月线数据初始化完成。")
 
 
 @cli.command()
-def import_daily_data():
-    """导入ODL日线数据
+@click.option('-f', type=click.Choice(['d','w', 'm']), prompt=True, help='d：日线数据，w：导入周线数据，m：导入月线数据')
+def import_dwm_data(f):
+    """导入K线数据
     """
-    click.confirm("正在导入日线数据，是否继续？", abort=True)
-    import_daily_k_data.import_data()
-    click.echo("ODL日线数据导入完成。")
-
-
-@cli.command()
-@click.option('-f', type=click.Choice(['w', 'm']), prompt=True, help='w：导入周线数据，m：导入月线数据')
-def import_wm_data(f):
-    """导入ODL周月线数据
-    """
-    click.confirm("正在导入导入ODL周月线数据，是否继续？", abort=True)
-    import_wm_k_data.import_data(f)
+    click.confirm("正在导入导入ODL-k线数据，是否继续？", abort=True)
+    bdl_import_k_data.import_data(f)
     click.echo("ODL周月线数据导入完成。")
 
 
