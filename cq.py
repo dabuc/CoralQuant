@@ -2,7 +2,8 @@
 """命令工具"""
 from coralquant.etl import bdl_import_k_data
 import click
-from coralquant.stock_basic import get_stock_basic
+from coralquant.spider import ts_stock_basic
+from coralquant.spider import bs_stock_basic
 from coralquant import baostck
 
 
@@ -13,11 +14,19 @@ def cli():
 
 
 @cli.command()
-def update_stock_basic():
-    """更新A股股票列表
+def update_ts_stock_basic():
+    """更新ts-A股股票列表
     """
-    get_stock_basic()
-    click.echo("A股股票列表更新完成。")
+    ts_stock_basic.get_stock_basic()
+    click.echo("ts-A股股票列表更新完成。")
+
+
+@cli.command()
+def update_bs_stock_basic():
+    """更新bs-A股股票列表
+    """
+    bs_stock_basic.get_stock_basic()
+    click.echo("bs-A股股票列表更新完成。")
 
 
 @cli.command()
