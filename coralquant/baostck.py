@@ -46,7 +46,7 @@ def init_history_k_data_plus(frequency,
     _logger.info("login respond error_code:" + lg.error_code)
     _logger.info("login respond  error_msg:" + lg.error_msg)
 
-    d_fields="date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,peTTM,pbMRQ,psTTM,pcfNcfTTM,isST",
+    d_fields="date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,peTTM,pbMRQ,psTTM,pcfNcfTTM,isST"
     w_m_fields='date,code,open,high,low,close,volume,amount,adjustflag,turn,pctChg'
     min_fields='date,time,code,open,high,low,close,volume,amount,adjustflag'
 
