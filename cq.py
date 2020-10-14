@@ -7,7 +7,6 @@ from coralquant.etl import bdl_import_k_data
 import click
 from coralquant.spider import ts_stock_basic
 from coralquant.spider import bs_stock_basic
-from coralquant import baostck
 from coralquant.spider.bs_history_k_data import init_history_k_data_plus
 
 
