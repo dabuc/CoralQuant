@@ -96,7 +96,7 @@ def init_history_k_data_plus(frequency,
     table_name = frequency_tablename[frequency]
 
     with session_maker() as sm:
-        rp = sm.query(TaskTable).filter(TaskTable.task == TaskEnum.获取历史A股K线数据.value, TaskTable.finished == False).limit(3)
+        rp = sm.query(TaskTable).filter(TaskTable.task == TaskEnum.获取历史A股K线数据.value, TaskTable.finished == False)
         step = 1
         for task in rp:
             try:
