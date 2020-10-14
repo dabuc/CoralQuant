@@ -2,9 +2,9 @@
 """
 基础数据层数据模型
 """
-from sqlalchemy import Table, Column, Integer, BigInteger, Numeric, String, Enum, Float, Boolean, Date
-from coralquant.models import metadata
-
+from datetime import datetime
+from sqlalchemy import MetaData, Table, Column, Integer, BigInteger, Numeric, String, Enum, Float, Boolean, Date, DateTime, ForeignKey
+metadata = MetaData()
 
 daily_k_data = Table(
     "bdl_bs_daily_k_data",
@@ -60,3 +60,6 @@ monthly_k_data = Table(
     Column('turn', Float, nullable=False),  #换手率
     Column('pctChg', Float, nullable=False),  #涨跌幅（百分比）
 )
+
+if __name__ == "__main__":
+    pass

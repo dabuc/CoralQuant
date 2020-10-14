@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """数据仓库管理工具"""
 import click
-from sqlalchemy import create_engine
-from coralquant.models import metadata, bdl_model, odl_model
+from coralquant.database import engine
+from coralquant.models import bdl_model, odl_model,orm_model
 from coralquant.settings import CQ_Config
 
 
@@ -36,8 +36,9 @@ def create_dw():
     """
     click.confirm("正在创建操作数据层数据表，是否继续？", abort=True)
 
-    engine = create_engine(CQ_Config.DATABASE_URL)
-    metadata.create_all(engine)
+    odl_model.metadata.create_all(engine)
+    bdl_model.metadata.create_all(engine)
+    orm_model.Base.metadata.create_all(engine)
     click.echo("数据层数据表创建完成")
 
 

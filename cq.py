@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 """命令工具"""
+from datetime import datetime
+from coralquant import taskmanage
+from sqlalchemy.sql.sqltypes import String
 from coralquant.etl import bdl_import_k_data
 import click
 from coralquant.spider import ts_stock_basic
 from coralquant.spider import bs_stock_basic
 from coralquant import baostck
+from coralquant.spider.bs_history_k_data import init_history_k_data_plus
 
 
 @click.group()
@@ -30,34 +34,22 @@ def update_bs_stock_basic():
 
 
 @cli.command()
-def init_d_history_k_data_plus():
-    """初始化日线数据
+@click.option('-f', type=click.Choice(['d', 'w', 'm']), prompt=True, help='d：日线数据，w：周线数据，m：月线数据')
+@click.pass_context
+def init_d_history_k_data_plus(ctx,f):
+    """创建新的任务列表，初始化历史k线数据
     """
-    click.confirm("正在初始化日线数据，是否继续？", abort=True)
-    baostck.init_history_k_data_plus('d', 'odl_history_A_stock_k_data')
-    click.echo("日线数据初始化完成。")
+    click.confirm("正在初始化 {}-历史k线数据，是否继续？".format(f), abort=True)
+    #创建任务
+    ctx.invoke(create_task, n=1, bd='1990-12-19', t=1, d=1)
+    ctx.invoke(create_task, n=1, bd='1990-12-19', t=2, d=0)
+
+    init_history_k_data_plus(f)
+    click.echo("{}-线数据初始化完成。".format(f))
 
 
 @cli.command()
-def init_w_history_k_data_plus():
-    """初始化周线数据
-    """
-    click.confirm("正在初始化周线数据，是否继续？", abort=True)
-    baostck.init_history_k_data_plus('w', 'odl_w_history_A_stock_k_data')
-    click.echo("周线线数据初始化完成。")
-
-
-@cli.command()
-def init_m_history_k_data_plus():
-    """初始化月线数据
-    """
-    click.confirm("正在初始化月线数据，是否继续？", abort=True)
-    baostck.init_history_k_data_plus('w', 'odl_m_history_A_stock_k_data')
-    click.echo("月线数据初始化完成。")
-
-
-@cli.command()
-@click.option('-f', type=click.Choice(['d','w', 'm']), prompt=True, help='d：日线数据，w：导入周线数据，m：导入月线数据')
+@click.option('-f', type=click.Choice(['d', 'w', 'm']), prompt=True, help='d：日线数据，w：导入周线数据，m：导入月线数据')
 def import_dwm_data(f):
     """导入K线数据
     """
@@ -66,9 +58,25 @@ def import_dwm_data(f):
     click.echo("ODL周月线数据导入完成。")
 
 
+@cli.command()
+@click.option('-n', type=click.INT, prompt=True, help='n：任务ID')
+@click.option('-bd', type=click.STRING, prompt=True, help='开始时间,1990-12-19')
+@click.option('-ed', type=click.STRING, default=datetime.now().strftime("%Y-%m-%d"), help='结束时间,默认今天')
+@click.option('-t', type=click.STRING, help='证券类型，其中1：股票，2：指数,3：其它')
+@click.option('-s', type=click.STRING, help='上市状态，其中1：上市，0：退市')
+@click.option('-d', type=click.BOOL, default=False, help='是否删除历史相同的任务，默认否')
+def create_task(n, bd, ed, t, s, d):
+    """创建任务
+    """
+    begin_date = datetime.strptime(bd, "%Y-%m-%d").date()
+    end_date = datetime.strptime(ed, "%Y-%m-%d").date()
+
+    taskmanage.create_task(n, begin_date, end_date, type=t, status=s,isdel=d)
+    click.echo("任务创建成功")
+
+
 def main():
     cli()
-
 
 if __name__ == "__main__":
     main()

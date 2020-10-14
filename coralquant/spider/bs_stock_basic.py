@@ -1,10 +1,7 @@
 import baostock as bs
 import pandas as pd
-from sqlalchemy import create_engine
+from coralquant.database import engine
 from coralquant.settings import CQ_Config
-
-engine = create_engine(CQ_Config.DATABASE_URL)
-connection = engine.connect()
 
 
 def get_stock_basic():
@@ -31,7 +28,7 @@ def get_stock_basic():
     result = pd.DataFrame(data_list, columns=rs.fields)
     # 输出结果集
     result.to_sql('odl_bs_stock_basic',
-                connection,
+                engine,
                 schema='stock_dw',
                 if_exists='replace',
                 index=False)

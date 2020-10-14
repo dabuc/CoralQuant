@@ -2,8 +2,8 @@
 """
 操作数据层数据模型，用于保存原始数据
 """
-from sqlalchemy import Table, Column, Integer, BigInteger, Numeric, String, Enum, Float, Boolean, Date
-from coralquant.models import metadata
+from sqlalchemy import MetaData, Table, Column, Integer, BigInteger, Numeric, String, Enum, Float, Boolean, Date
+metadata = MetaData()
 
 
 stock_basic = Table(

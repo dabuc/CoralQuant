@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """股票列表"""
-from sqlalchemy import create_engine
+from coralquant.database import engine
 from coralquant.settings import CQ_Config
 from coralquant.models.odl_model import stock_basic
 import tushare as ts
@@ -12,10 +12,6 @@ def get_stock_basic():
     """
     获取股票列表
     """
-    engine = create_engine(CQ_Config.DATABASE_URL)
-    connection = engine.connect()
-    del_stock=delete(stock_basic)
-    result=connection.execute(del_stock)
 
     pro = ts.pro_api(CQ_Config.TUSHARE_TOKEN)
     #查询当前所有正常上市交易的股票列表
@@ -27,10 +23,11 @@ def get_stock_basic():
     rs_P = pro.stock_basic(exchange='', list_status='P', fields=fields)
 
     result = pd.concat([rs_L, rs_D, rs_P])
+
     result.to_sql('odl_ts_stock_basic',
-                connection,
+                engine,
                 schema='stock_dw',
-                if_exists='append',
+                if_exists='replace',
                 index=False)
 
 
