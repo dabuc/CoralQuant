@@ -5,6 +5,7 @@ from sqlalchemy import MetaData, Table, insert, select
 from coralquant.database import engine
 from coralquant.settings import CQ_Config
 from coralquant.models.orm_model import session_maker,TaskTable
+from coralquant.stringhelper import TaskEnum
 
 _logger = logger.Logger(__name__).get_log()
 
@@ -25,6 +26,16 @@ def create_task(task: int, begin_date: date, end_date: date, codes: list = [], t
 
     status：上市状态，其中1：上市，0：退市
     """
+    try:
+        taskEnum= TaskEnum(task)
+    except Exception as e:
+        _logger.info('指定的任务不存在，创建任务表失败！')
+        return
+    
+     
+
+
+
     if not codes:
         tmp = Table('odl_bs_stock_basic', meta, autoload=True, autoload_with=engine)
         s = select([tmp.c.code])
@@ -49,6 +60,7 @@ def create_task(task: int, begin_date: date, end_date: date, codes: list = [], t
         for c in codes:
             tasktable= TaskTable(
                 task=task,
+                task_name= taskEnum.name,
                 ts_code=c.code,
                 begin_date=begin_date,
                 end_date=end_date

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-from enum import Enum
-class TaskEnum(Enum):
+from enum import IntEnum,unique
+
+@unique
+class TaskEnum(IntEnum):
     """
     docstring
     """
