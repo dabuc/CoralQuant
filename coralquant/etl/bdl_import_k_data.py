@@ -8,6 +8,7 @@ from coralquant.models.bdl_model import daily_k_data, weekly_k_data, monthly_k_d
 from coralquant.models.odl_model import stock_basic
 from coralquant.settings import CQ_Config
 from coralquant import logger
+from coralquant.stringhelper import frequency_tablename
 
 _logger = logger.Logger(__name__).get_log()
 
@@ -58,15 +59,14 @@ def import_data(frequency: str):
     total = 0  #计算总行数
 
     if frequency == 'w':
-        tablename = 'odl_w_history_A_stock_k_data'
+        
         table_k_data = weekly_k_data
     elif frequency == 'm':
-        tablename = 'odl_m_history_A_stock_k_data'
         table_k_data = monthly_k_data
     else:
-        tablename = 'odl_history_A_stock_k_data'
         table_k_data = daily_k_data
     
+    tablename = frequency_tablename[frequency]
     metadata = MetaData()
     tmp = Table(tablename, metadata, autoload=True, autoload_with=engine)
 
