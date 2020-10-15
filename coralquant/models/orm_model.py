@@ -3,28 +3,10 @@
 定义sqlalchemy的全局对象
 """
 from datetime import datetime
-from coralquant.database import engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from contextlib import contextmanager
-from sqlalchemy import Table, Column, Integer, String, Date, Float, DateTime, Boolean, UniqueConstraint
-from coralquant.settings import CQ_Config
 
-Session = sessionmaker(bind=engine)
-Base = declarative_base()
-session = Session()
-
-
-@contextmanager
-def session_maker(session=session):
-    try:
-        yield session
-        session.commit()
-    except:
-        session.rollback()
-        raise
-    finally:
-        session.close()
+from coralquant.database import Base
+from sqlalchemy import (Boolean, Column, Date, DateTime, Float, Integer,
+                        String, Table, UniqueConstraint)
 
 
 class TaskTable(Base):

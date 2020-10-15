@@ -10,15 +10,13 @@ import traceback
 from coralquant import logger
 from coralquant.models.odl_model import stock_basic
 from coralquant.settings import CQ_Config
-from coralquant.models.orm_model import session_maker, TaskTable
+from coralquant.models.orm_model import TaskTable
 from coralquant.stringhelper import TaskEnum
-from coralquant.database import engine
-from concurrent.futures import ThreadPoolExecutor
+from coralquant.database import engine, session_maker
 from threading import Thread
 from coralquant.stringhelper import frequency_tablename
 
 _logger = logger.Logger(__name__).get_log()
-
 
 d_fields = "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,peTTM,pbMRQ,psTTM,pcfNcfTTM,isST"
 w_m_fields = 'date,code,open,high,low,close,volume,amount,adjustflag,turn,pctChg'
@@ -58,12 +56,11 @@ def _parse_data(content, ts_code, frequency, is_first):
     table_name = frequency_tablename[frequency]
 
     try:
-        content.to_sql(table_name, engine, schema='stock_dw', if_exists='replace' if is_first else 'append', index=False)
+        content.to_sql(table_name, engine, schema='stock_dw', if_exists='replace' if is_first else 'append', index=True)
     except Exception as e:
-        _logger.error('{}保存出错：{}'.format(ts_code,traceback.format_exc(1)))
+        _logger.error('{}保存出错：{}'.format(ts_code, traceback.format_exc(1)))
     else:
         _logger.info('{}保存成功'.format(ts_code))
-    
 
 
 def _query_history_k_data_plus(fields: str, frequency: str, adjustflag: str) -> pd.DataFrame:

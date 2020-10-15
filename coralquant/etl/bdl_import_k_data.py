@@ -2,7 +2,7 @@ from datetime import datetime
 import decimal
 
 from numpy.lib.function_base import insert
-from sqlalchemy import MetaData, Table,  select
+from sqlalchemy import MetaData, Table, select, or_
 from coralquant.database import engine
 from coralquant.models.bdl_model import daily_k_data, weekly_k_data, monthly_k_data
 from coralquant.models.odl_model import stock_basic
@@ -12,17 +12,18 @@ from coralquant.stringhelper import frequency_tablename
 
 _logger = logger.Logger(__name__).get_log()
 
+
 def get_bs_stock_code():
     """
     获取bs股票代码
     """
-    s = select([stock_basic.c.ts_code])
-    rp = engine.execute(s)
+    metadata = MetaData()
+    tmp = Table('odl_bs_stock_basic', metadata, autoload=True, autoload_with=engine)
+    rp = engine.execute(select([tmp.c.code]).where(or_(tmp.c.type == '1', tmp.c.type == '2')))
     result = []
     for row in rp:
-        s = row.ts_code.split('.')
-        new_s = '{}.{}'.format(s[1].lower(), s[0])
-        result.append(new_s)
+        code = row[0]
+        result.append(code)
     return result
 
 
@@ -59,13 +60,13 @@ def import_data(frequency: str):
     total = 0  #计算总行数
 
     if frequency == 'w':
-        
+
         table_k_data = weekly_k_data
     elif frequency == 'm':
         table_k_data = monthly_k_data
     else:
         table_k_data = daily_k_data
-    
+
     tablename = frequency_tablename[frequency]
     metadata = MetaData()
     tmp = Table(tablename, metadata, autoload=True, autoload_with=engine)

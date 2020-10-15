@@ -3,8 +3,8 @@
 操作数据层数据模型，用于保存原始数据
 """
 from sqlalchemy import MetaData, Table, Column, Integer, BigInteger, Numeric, String, Enum, Float, Boolean, Date
+from coralquant.database import Base
 metadata = MetaData()
-
 
 stock_basic = Table(
     "odl_ts_stock_basic",
@@ -24,6 +24,45 @@ stock_basic = Table(
     Column("delist_date", String(8)),  # 退市日期
     Column("is_hs", String(1), nullable=False),  # 是否沪深港通标的，N否 H沪股通 S深股通
 )
+
+
+class BS_Stock_Basic(Base):
+    """
+    日线历史行情数据
+    """
+    __tablename__ = "odl_bs_stock_basic"
+    code = Column(String(10), primary_key=True)
+    code_name = Column(String(100))
+    ipoDate = Column(String(10))
+    outDate = Column(String(10))
+    type = Column(String(10))
+    status = Column(String(10))
+
+
+class D_History_A_Stock_K_Data(Base):
+    """
+    日线历史行情数据
+    """
+    __tablename__ = "odl_d_history_A_stock_k_data"
+    id = Column(BigInteger,primary_key=True)
+    date = Column(String(10))
+    code = Column(String(10))
+    open = Column(String(15))
+    high = Column(String(15))
+    low = Column(String(15))
+    close = Column(String(15))
+    preclose = Column(String(15))
+    volume = Column(String(20))
+    amount = Column(String(23))
+    adjustflag = Column(String(2))
+    turn = Column(String(15))
+    tradestatus = Column(String(2))
+    pctChg = Column(String(15))
+    peTTM = Column(String(20))
+    pbMRQ = Column(String(20))
+    psTTM = Column(String(20))
+    pcfNcfTTM = Column(String(20))
+    isST = Column(String(2))
 
 
 if __name__ == "__main__":
