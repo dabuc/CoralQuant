@@ -134,8 +134,10 @@ def import_data(frequency: str):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         with session_maker() as session:
             rowsnum= session.query(from_table).count()
+            _logger.info("需要导入{}条数据".format(rowsnum))
             pagesize=5000
             pagenum = math.ceil(rowsnum/ pagesize)
+            _logger.info("一共分为{}次导入".format(pagenum))
             thread_list=[]
             for i in range(0,pagenum):
                 rp=session.query(from_table).offset(pagesize*i).limit(pagesize)
