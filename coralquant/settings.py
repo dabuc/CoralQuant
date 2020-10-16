@@ -13,6 +13,8 @@ class BaseConfig():
     DATABASE_URL = os.getenv("DATABASE_URL",'')
     TUSHARE_TOKEN= os.getenv("TUSHARE_TOKEN",'')
     LOG_PATH=os.getenv("LOG_PATH",base_dir+'/logs/coralquant.log')
+    BARK_HOST=os.getenv("BARK_HOST",'')
+    BARK_KEY=os.getenv("BARK_KEY",'')
 
 class DevelopmentConfig(BaseConfig):
     """

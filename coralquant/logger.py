@@ -2,6 +2,7 @@
 """
 本模块提供一个公用的Logger，用于模块
 """
+from coralquant.util.barkhttphandler import BarkHTTPHandler
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
@@ -45,6 +46,16 @@ class Logger:
 
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
+
+        if cfg.BARK_HOST != '':
+            #定义Bark消息推送服务
+            bh= BarkHTTPHandler(cfg.BARK_HOST, cfg.BARK_KEY)
+            bh.setLevel(logging.ERROR)
+            self.logger.addHandler(bh)
+
+
+
+
 
     def get_log(self):
         """获取记录器对象"""
