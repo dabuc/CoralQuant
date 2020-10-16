@@ -1,10 +1,10 @@
 import math
-from coralquant.database import session_maker,get_new_session
-from coralquant.models.odl_model import D_History_A_Stock_K_Data, M_History_A_Stock_K_Data, T5_History_A_Stock_K_Data
+from coralquant.database import session_maker, get_new_session
+from coralquant.models.odl_model import D_History_A_Stock_K_Data, M_History_A_Stock_K_Data, T5_History_A_Stock_K_Data, W_History_A_Stock_K_Data
 from datetime import datetime
 import decimal
 
-from coralquant.models.bdl_model import DailyKData , WeeklyKData, MonthlyKData
+from coralquant.models.bdl_model import DailyKData, WeeklyKData, MonthlyKData
 from coralquant import logger
 import concurrent.futures
 
@@ -37,7 +37,7 @@ def get_float_from_str(str):
 
 frequency_from_table = {
     'd': D_History_A_Stock_K_Data,
-    'w': M_History_A_Stock_K_Data,
+    'w': W_History_A_Stock_K_Data,
     'm': M_History_A_Stock_K_Data,
     '5': T5_History_A_Stock_K_Data
 }
@@ -49,11 +49,12 @@ frequency_to_table = {
     #'5': T5_History_A_Stock_K_Data
 }
 
-def _build_result_data(rp,frequency):
+
+def _build_result_data(rp, frequency):
     """
     构建结果数据列表
     """
-    result=[]
+    result = []
     for row in rp:
         tmp = {
             'date': datetime.strptime(row.date, "%Y-%m-%d").date(),
@@ -79,17 +80,18 @@ def _build_result_data(rp,frequency):
         result.append(tmp)
     return result
 
-def _insert_data(data:list,frequency,pagenum):
+
+def _insert_data(data: list, frequency, pagenum):
     """
     导入数据
     """
     session = get_new_session()
-    ins_data=[]
-    num = 0 #计数
+    ins_data = []
+    num = 0  #计数
     try:
         with session_maker(session) as session:
-            for dic in data:   
-                to_table= frequency_to_table[frequency]()
+            for dic in data:
+                to_table = frequency_to_table[frequency]()
                 to_table.date = dic['date']
                 to_table.code = dic['code']
                 to_table.open = dic['open']
@@ -102,15 +104,15 @@ def _insert_data(data:list,frequency,pagenum):
                 to_table.turn = dic['turn']
                 to_table.pctChg = dic['pctChg']
                 if frequency == 'd':
-                    to_table.preclose=dic['preclose'] 
-                    to_table.tradestatus=dic['tradestatus']
-                    to_table.peTTM=dic['peTTM']
-                    to_table.pbMRQ=dic['pbMRQ']
-                    to_table.psTTM=dic['psTTM']
-                    to_table.pcfNcfTTM=dic['pcfNcfTTM']
-                    to_table.isST=dic['isST']
+                    to_table.preclose = dic['preclose']
+                    to_table.tradestatus = dic['tradestatus']
+                    to_table.peTTM = dic['peTTM']
+                    to_table.pbMRQ = dic['pbMRQ']
+                    to_table.psTTM = dic['psTTM']
+                    to_table.pcfNcfTTM = dic['pcfNcfTTM']
+                    to_table.isST = dic['isST']
                 ins_data.append(to_table)
-                num+=1
+                num += 1
                 dm = divmod(num, 1000)
                 if dm[1] == 0:
                     session.bulk_save_objects(ins_data)
@@ -120,7 +122,7 @@ def _insert_data(data:list,frequency,pagenum):
                 session.bulk_save_objects(ins_data)
                 session.commit()
     except Exception as e:
-        _logger.error("第{}页数据导入失败:{}".format(pagenum,repr(e)))
+        _logger.error("第{}页数据导入失败:{}".format(pagenum, repr(e)))
     else:
         _logger.info("第{}页数据导入完成".format(pagenum))
 
@@ -133,16 +135,17 @@ def import_data(frequency: str):
     from_table = frequency_from_table[frequency]
     with concurrent.futures.ThreadPoolExecutor() as executor:
         with session_maker() as session:
-            rowsnum= session.query(from_table).count()
+            rowsnum = session.query(from_table).count()
             _logger.info("需要导入{}条数据".format(rowsnum))
-            pagesize=5000
-            pagenum = math.ceil(rowsnum/ pagesize)
+            pagesize = 5000
+            pagenum = math.ceil(rowsnum / pagesize)
             _logger.info("一共分为{}次导入".format(pagenum))
-            thread_list=[]
-            for i in range(0,pagenum):
-                rp=session.query(from_table).offset(pagesize*i).limit(pagesize)
-                to_data= _build_result_data(rp,frequency)
-                executor.submit(_insert_data, to_data, frequency,i+1)
+            thread_list = []
+            for i in range(0, pagenum):
+                rp = session.query(from_table).offset(pagesize * i).limit(pagesize)
+                to_data = _build_result_data(rp, frequency)
+                executor.submit(_insert_data, to_data, frequency, i + 1)
+
 
 if __name__ == "__main__":
     pass
