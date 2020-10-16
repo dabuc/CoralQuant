@@ -120,7 +120,7 @@ def _insert_data(data:list,frequency,pagenum):
                 session.bulk_save_objects(ins_data)
                 session.commit()
     except Exception as e:
-        _logger.error("第{}页数据导入失败".format(pagenum))
+        _logger.error("第{}页数据导入失败:{}".format(pagenum,repr(e)))
     else:
         _logger.info("第{}页数据导入完成".format(pagenum))
 
