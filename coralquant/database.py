@@ -10,7 +10,15 @@ engine = create_engine(CQ_Config.DATABASE_URL)
 
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
-session = Session()
+session=Session()
+
+def get_new_session():
+    """
+    获取新Session
+    """
+    session=Session()
+    return session
+
 
 
 @contextmanager

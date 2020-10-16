@@ -1,12 +1,8 @@
-from datetime import datetime
-import random
-import time
-
 import baostock as bs
 import pandas as pd
 from sqlalchemy import select
 import traceback
-
+import time
 from coralquant import logger
 from coralquant.models.odl_model import stock_basic
 from coralquant.settings import CQ_Config
@@ -14,6 +10,7 @@ from coralquant.models.orm_model import TaskTable
 from coralquant.stringhelper import TaskEnum
 from coralquant.database import engine, session_maker
 from threading import Thread
+import concurrent.futures
 from coralquant.stringhelper import frequency_tablename
 
 _logger = logger.Logger(__name__).get_log()
@@ -56,7 +53,7 @@ def _parse_data(content, ts_code, frequency, is_first):
     table_name = frequency_tablename[frequency]
 
     try:
-        content.to_sql(table_name, engine, schema='stock_dw', if_exists='replace' if is_first else 'append', index=True)
+        content.to_sql(table_name, engine, schema='stock_dw', if_exists='append', index=False)
     except Exception as e:
         _logger.error('{}保存出错：{}'.format(ts_code, traceback.format_exc(1)))
     else:
@@ -72,50 +69,46 @@ def _query_history_k_data_plus(fields: str, frequency: str, adjustflag: str) -> 
     lg = bs.login()
 
     step = 1
-    with session_maker() as sm:
-        rp = sm.query(TaskTable).filter(TaskTable.task == TaskEnum.获取历史A股K线数据.value,
-                                        TaskTable.finished == False).limit(20)
-        for task in rp:
-            if task.finished:
-                continue
-
-            start_date = task.begin_date.strftime("%Y-%m-%d")
-            end_date = task.end_date.strftime("%Y-%m-%d")
-
-            max_try = 8  # 失败重连的最大次数
-
-            for i in range(max_try):
-                rs = bs.query_history_k_data_plus(task.ts_code,
-                                                  fields,
-                                                  start_date=start_date,
-                                                  end_date=end_date,
-                                                  frequency=frequency,
-                                                  adjustflag=adjustflag)
-                if rs.error_code == '0':
-                    _logger.info('{}下载成功'.format(task.ts_code))
-                    # executor = ThreadPoolExecutor()
-                    # executor.submit(_parse_data)
-                    data_list = []
-                    while (rs.error_code == '0') & rs.next():
-                        # 获取一条记录，将记录合并在一起
-                        data_list.append(rs.get_row_data())
-                    result = pd.DataFrame(data_list, columns=rs.fields)
-                    is_first = True if step == 1 else False
-                    thr = Thread(target=_parse_data, args=[result, task.ts_code, frequency, is_first])  #后台解析数据
-                    thr.start()
-                    if is_first:
-                        thr.join()
-                    task.finished = True
-                    step += 1
-                    break
-                elif i < (max_try - 1):
-                    time.sleep(2)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        with session_maker() as sm:
+            rp = sm.query(TaskTable).filter(TaskTable.task == TaskEnum.获取历史A股K线数据.value,
+                                            TaskTable.finished == False).limit(20)
+            for task in rp:
+                if task.finished:
                     continue
-                else:
-                    _logger.error('query_history_k_data_plus respond error_code:' + rs.error_code)
-                    _logger.error('query_history_k_data_plus respond  error_msg:' + rs.error_msg)
 
-        sm.commit()
+                start_date = task.begin_date.strftime("%Y-%m-%d")
+                end_date = task.end_date.strftime("%Y-%m-%d")
+
+                max_try = 8  # 失败重连的最大次数
+
+                for i in range(max_try):
+                    rs = bs.query_history_k_data_plus(task.ts_code,
+                                                      fields,
+                                                      start_date=start_date,
+                                                      end_date=end_date,
+                                                      frequency=frequency,
+                                                      adjustflag=adjustflag)
+                    if rs.error_code == '0':
+                        _logger.info('{}下载成功'.format(task.ts_code))
+                        data_list = []
+                        while (rs.error_code == '0') & rs.next():
+                            # 获取一条记录，将记录合并在一起
+                            data_list.append(rs.get_row_data())
+                        result = pd.DataFrame(data_list, columns=rs.fields)
+                        is_first = True if step == 1 else False
+                        executor.submit(_parse_data, result, task.ts_code, frequency, is_first)
+                        task.finished = True
+                        step += 1
+                        break
+                    elif i < (max_try - 1):
+                        time.sleep(2)
+                        continue
+                    else:
+                        _logger.error('query_history_k_data_plus respond error_code:' + rs.error_code)
+                        _logger.error('query_history_k_data_plus respond  error_msg:' + rs.error_msg)
+
+            sm.commit()
     #### 登出系统 ####
     bs.logout()
 

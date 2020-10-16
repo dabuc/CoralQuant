@@ -39,30 +39,89 @@ class BS_Stock_Basic(Base):
     status = Column(String(10))
 
 
+
+
 class D_History_A_Stock_K_Data(Base):
     """
     日线历史行情数据
     """
     __tablename__ = "odl_d_history_A_stock_k_data"
-    id = Column(BigInteger,primary_key=True)
-    date = Column(String(10))
-    code = Column(String(10))
-    open = Column(String(15))
-    high = Column(String(15))
-    low = Column(String(15))
-    close = Column(String(15))
-    preclose = Column(String(15))
-    volume = Column(String(20))
-    amount = Column(String(23))
-    adjustflag = Column(String(2))
-    turn = Column(String(15))
-    tradestatus = Column(String(2))
-    pctChg = Column(String(15))
-    peTTM = Column(String(20))
-    pbMRQ = Column(String(20))
-    psTTM = Column(String(20))
-    pcfNcfTTM = Column(String(20))
-    isST = Column(String(2))
+    id = Column('id',BigInteger,primary_key=True)
+    date = Column('date',String(10))
+    code = Column('code',String(10))
+    open = Column('open',String(15))
+    high = Column('high',String(15))
+    low = Column('low',String(15))
+    close = Column('close',String(15))
+    preclose = Column('preclose',String(15))
+    volume = Column('volume',String(20))
+    amount = Column('amount',String(23))
+    adjustflag = Column('adjustflag',String(1))
+    turn = Column('turn',String(15))
+    tradestatus = Column('tradestatus',String(1))
+    pctChg = Column('pctChg',String(15))
+    peTTM = Column('peTTM',String(20))
+    pbMRQ = Column('pbMRQ',String(20))
+    psTTM = Column('psTTM',String(20))
+    pcfNcfTTM = Column('pcfNcfTTM',String(20))
+    isST = Column('isST',String(1))
+
+class W_History_A_Stock_K_Data(Base):
+    """
+    周线历史行情数据
+    """
+    __tablename__ = "odl_w_history_A_stock_k_data"
+    id = Column('id',BigInteger,primary_key=True)
+    date = Column('date',String(10))
+    code = Column('code',String(10))
+    open = Column('open',String(15))
+    high = Column('high',String(15))
+    low = Column('low',String(15))
+    close = Column('close',String(15))
+    volume = Column('volume',String(20))
+    amount = Column('amount',String(23))
+    adjustflag = Column('adjustflag',String(1))
+    turn = Column('turn',String(15))
+    pctChg = Column('pctChg',String(15))
+
+
+class M_History_A_Stock_K_Data(Base):
+    """
+    月线历史行情数据
+    """
+    __tablename__ = "odl_m_history_A_stock_k_data"
+    id = Column('id',BigInteger,primary_key=True)
+    date = Column('date',String(10))
+    code = Column('code',String(10))
+    open = Column('open',String(15))
+    high = Column('high',String(15))
+    low = Column('low',String(15))
+    close = Column('close',String(15))
+    volume = Column('volume',String(20))
+    amount = Column('amount',String(23))
+    adjustflag = Column('adjustflag',String(1))
+    turn = Column('turn',String(15))
+    pctChg = Column('pctChg',String(15))
+
+
+class T5_History_A_Stock_K_Data(Base):
+    """
+    5分钟线历史行情数据
+    """
+    __tablename__ = "odl_t5_history_A_Stock_K_Data"
+    id = Column('id',BigInteger,primary_key=True)
+    date = Column('date',String(10))
+    time = Column('time',String(10))
+    code = Column('code',String(10))
+    open = Column('open',String(15))
+    high = Column('high',String(15))
+    low = Column('low',String(15))
+    close = Column('close',String(15))
+    volume = Column('volume',String(20))
+    amount = Column('amount',String(23))
+    adjustflag = Column('adjustflag',String(1))
+
+
 
 
 if __name__ == "__main__":

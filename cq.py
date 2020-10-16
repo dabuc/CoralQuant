@@ -2,7 +2,6 @@
 """命令工具"""
 from datetime import datetime
 from coralquant import taskmanage
-from sqlalchemy.sql.sqltypes import String
 from coralquant.etl import bdl_import_k_data
 import click
 from coralquant.spider import ts_stock_basic
@@ -33,7 +32,7 @@ def update_bs_stock_basic():
 
 
 @cli.command()
-@click.option('-f', type=click.Choice(['d', 'w', 'm']), prompt=True, help='d：日线数据，w：周线数据，m：月线数据')
+@click.option('-f', type=click.Choice(['d', 'w', 'm','5']), prompt=True, help='d：日线数据，w：周线数据，m：月线数据')
 @click.pass_context
 def init_d_history_k_data_plus(ctx,f):
     """创建新的任务列表，初始化历史k线数据
@@ -76,6 +75,9 @@ def create_task(n, bd, ed, t, s, d):
 
 def main():
     cli()
+    #import_dwm_data(['-f','d'])
+    #init_d_history_k_data_plus(['-f','d'])
+
 
 if __name__ == "__main__":
     main()
