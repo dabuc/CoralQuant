@@ -7,6 +7,7 @@ import decimal
 from coralquant.models.bdl_model import DailyKData, WeeklyKData, MonthlyKData
 from coralquant import logger
 import concurrent.futures
+from sqlalchemy.sql import func
 
 _logger = logger.Logger(__name__).get_log()
 
@@ -127,36 +128,47 @@ def _insert_data(data: list, frequency, pagenum):
         _logger.info("第{}页数据导入完成".format(pagenum))
 
 
+def getid(from_table, pos):
+    """
+    根据位置，获取对应的主键ID
+    """
+    with session_maker() as session:
+        #idlist[i*pagenum]
+        session.query(from_table.id).offset(pos).limit(1)
+
+
 def import_data(frequency: str):
     """
     导入日线数据
     """
-#offset：当偏移量大于800万时，offset limit模式性能下降严重，查询一次要12秒……
-#改成直接定位主键id查询。
-
+    #offset：当偏移量大于800万时，offset limit模式性能下降严重，查询一次要12秒……
+    #改成直接定位主键id查询。
 
     from_table = frequency_from_table[frequency]
     with concurrent.futures.ThreadPoolExecutor() as executor:
         with session_maker() as session:
-            idrp= session.query(from_table.id)
-            idlist=[x.id for x in idrp]
-            rowsnum = len(idlist)
-            _logger.info("需要导入{}条数据".format(rowsnum))
+            onerow = session.query(func.min(from_table.id), func.max(from_table.id)).one()
+            minid = onerow[0]
+            maxid = onerow[1]
+
+            if not minid:  #没有数据
+                return
+
             pagesize = 5000
-            pagenum = math.ceil(rowsnum / pagesize)
-            _logger.info("一共分为{}次导入".format(pagenum))
-            for i in range(0, pagenum):
-                if i==pagenum-1:
-                    rp = session.query(from_table).filter(from_table.id>=idlist[i*pagenum])
-                else:
-                    rp = session.query(from_table).filter(from_table.id>=idlist[i*pagenum],from_table.id<idlist[(i+1)*pagenum])
+            ahead_id = minid
+            next_id = ahead_id + pagesize
+            i = 0  #计数
+            while True:
+                if ahead_id > maxid:
+                    break
+                rp = session.query(from_table).filter(from_table.id >= ahead_id, from_table.id < next_id)
                 to_data = _build_result_data(rp, frequency)
                 executor.submit(_insert_data, to_data, frequency, i + 1)
-
+                i += 1
+                ahead_id = next_id
+                next_id = ahead_id + pagesize
     
-
-
-    
+    _logger.info("数据导入完成")
 
 
 if __name__ == "__main__":
