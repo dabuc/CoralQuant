@@ -131,20 +131,32 @@ def import_data(frequency: str):
     """
     导入日线数据
     """
+#offset：当偏移量大于800万时，offset limit模式性能下降严重，查询一次要12秒……
+#改成直接定位主键id查询。
+
 
     from_table = frequency_from_table[frequency]
     with concurrent.futures.ThreadPoolExecutor() as executor:
         with session_maker() as session:
-            rowsnum = session.query(from_table).count()
+            idrp= session.query(from_table.id)
+            idlist=[x.id for x in idrp]
+            rowsnum = len(idlist)
             _logger.info("需要导入{}条数据".format(rowsnum))
             pagesize = 5000
             pagenum = math.ceil(rowsnum / pagesize)
             _logger.info("一共分为{}次导入".format(pagenum))
-            thread_list = []
             for i in range(0, pagenum):
-                rp = session.query(from_table).offset(pagesize * i).limit(pagesize)
+                if i==pagenum-1:
+                    rp = session.query(from_table).filter(from_table.id>=idlist[i*pagenum])
+                else:
+                    rp = session.query(from_table).filter(from_table.id>=idlist[i*pagenum],from_table.id<idlist[(i+1)*pagenum])
                 to_data = _build_result_data(rp, frequency)
                 executor.submit(_insert_data, to_data, frequency, i + 1)
+
+    
+
+
+    
 
 
 if __name__ == "__main__":
