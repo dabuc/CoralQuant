@@ -50,7 +50,7 @@ def init_history_k_data(ctx,f):
 @cli.command()
 @click.option('-f', type=click.Choice(['d', 'w', 'm','5']), prompt=True, help='d：日线数据，w：周线数据，m：月线数据')
 def update_history_k_data(f):
-    """创建新的任务列表，初始化历史k线数据
+    """创建新的任务列表，更新历史k线数据
     """
     taskEnum= TaskEnum(f)
     click.confirm("准备更新-{}，是否继续？".format(taskEnum.name), abort=True)
