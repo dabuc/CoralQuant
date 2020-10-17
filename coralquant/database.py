@@ -31,3 +31,13 @@ def session_maker(session=session):
         raise
     finally:
         session.close()
+
+
+
+
+def del_table_data(table:Base):
+    """
+    清空指定表
+    """
+    with session_maker() as sn:
+        sn.query(table).delete()

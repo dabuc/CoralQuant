@@ -3,11 +3,14 @@
 操作数据层数据模型，用于保存原始数据
 """
 from datetime import datetime
-from sqlalchemy import MetaData, Table, Column, Integer, BigInteger, Numeric, String, Enum, Float, Boolean, Date
-from coralquant.database import Base
+from sqlalchemy import MetaData, Table, Column, Integer, BigInteger, Numeric, String, Enum, Float, Boolean, Date, DateTime
+from coralquant.database import Base, get_new_session, session_maker
 metadata = MetaData()
 
 stock_basic = Table(
+    """
+    TS-证券基本资料
+    """
     "odl_ts_stock_basic",
     metadata,
     Column("ts_code", String(10)),  # TS代码
@@ -29,7 +32,7 @@ stock_basic = Table(
 
 class BS_Stock_Basic(Base):
     """
-    日线历史行情数据
+    BS-证券基本资料
     """
     __tablename__ = "odl_bs_stock_basic"
     code = Column(String(10), primary_key=True)
@@ -38,6 +41,19 @@ class BS_Stock_Basic(Base):
     outDate = Column(String(10))
     type = Column(String(10))
     status = Column(String(10))
+    updated_on = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+    @staticmethod
+    def del_all_date():
+        """
+        删除全部数据
+        """
+        with session_maker(get_new_session()) as session:
+            session.query(BS_Stock_Basic).delete()
+
+        
+
+
 
 
 def default_t_date(context):

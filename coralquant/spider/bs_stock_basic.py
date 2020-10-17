@@ -1,13 +1,17 @@
+from coralquant.models.odl_model import BS_Stock_Basic
+from datetime import datetime
 import baostock as bs
 import pandas as pd
 from coralquant.database import engine
-from coralquant.settings import CQ_Config
 
 
 def get_stock_basic():
     """
-    获取bs-A股股票列表
+    获取最新BS-A股股票列表
     """
+    #清空原有数据
+    BS_Stock_Basic.del_all_date()
+
     # 登陆系统
     lg = bs.login()
     # 显示登陆返回信息
@@ -26,11 +30,12 @@ def get_stock_basic():
         # 获取一条记录，将记录合并在一起
         data_list.append(rs.get_row_data())
     result = pd.DataFrame(data_list, columns=rs.fields)
+    result['updated_on']=datetime.now()
     # 输出结果集
     result.to_sql('odl_bs_stock_basic',
                 engine,
                 schema='stock_dw',
-                if_exists='replace',
+                if_exists='append',
                 index=False)
 
     # 登出系统

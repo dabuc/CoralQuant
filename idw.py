@@ -36,9 +36,11 @@ def create_dw():
     """
     click.confirm("正在创建操作数据层数据表，是否继续？", abort=True)
 
-    # odl_model.metadata.create_all(engine)
-    # bdl_model.metadata.create_all(engine)
+    odl_model.Base.metadata.create_all(engine)
+    bdl_model.Base.metadata.create_all(engine)
     orm_model.Base.metadata.create_all(engine)
+
+
     click.echo("数据层数据表创建完成")
 
 

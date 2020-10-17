@@ -5,6 +5,7 @@ from datetime import datetime
 import decimal
 
 from coralquant.models.bdl_model import DailyKData, WeeklyKData, MonthlyKData
+from coralquant.stringhelper import frequency_odl_table_obj,frequency_bdl_table_obj
 from coralquant import logger
 import concurrent.futures
 from sqlalchemy.sql import func
@@ -34,21 +35,6 @@ def get_float_from_str(str):
     """
     r = 0 if str == "" else float(str)
     return r
-
-
-frequency_from_table = {
-    'd': D_History_A_Stock_K_Data,
-    'w': W_History_A_Stock_K_Data,
-    'm': M_History_A_Stock_K_Data,
-    '5': T5_History_A_Stock_K_Data
-}
-
-frequency_to_table = {
-    'd': DailyKData,
-    'w': WeeklyKData,
-    'm': MonthlyKData
-    #'5': T5_History_A_Stock_K_Data
-}
 
 
 def _build_result_data(rp, frequency):
@@ -92,7 +78,7 @@ def _insert_data(data: list, frequency, pagenum):
     try:
         with session_maker(session) as session:
             for dic in data:
-                to_table = frequency_to_table[frequency]()
+                to_table = frequency_bdl_table_obj[frequency]()
                 to_table.date = dic['date']
                 to_table.code = dic['code']
                 to_table.open = dic['open']
@@ -144,7 +130,7 @@ def import_data(frequency: str):
     #offset：当偏移量大于800万时，offset limit模式性能下降严重，查询一次要12秒……
     #改成直接定位主键id查询。
 
-    from_table = frequency_from_table[frequency]
+    from_table = frequency_odl_table_obj[frequency]
     with concurrent.futures.ThreadPoolExecutor() as executor:
         with session_maker() as session:
             onerow = session.query(func.min(from_table.id), func.max(from_table.id)).one()

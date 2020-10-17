@@ -1,20 +1,29 @@
 # -*- coding: utf-8 -*-
-from enum import IntEnum,unique
+from coralquant.models.bdl_model import DailyKData, MonthlyKData, WeeklyKData
+from coralquant.models.odl_model import D_History_A_Stock_K_Data, M_History_A_Stock_K_Data, T5_History_A_Stock_K_Data, W_History_A_Stock_K_Data
+from enum import Enum,unique
 
 @unique
-class TaskEnum(IntEnum):
+class TaskEnum(Enum):
     """
-    docstring
+    任务枚举
     """
-    获取历史A股K线数据 = 1
+    日线历史A股K线数据 = 'd'
+    周线历史A股K线数据 = 'w'
+    月线历史A股K线数据 = 'm'
 
 
-frequency_tablename = {
-    'd': 'odl_d_history_A_stock_k_data',
-    'w': 'odl_w_history_A_stock_k_data',
-    'm': 'odl_m_history_A_stock_k_data',
-    '5': 'odl_5_history_A_stock_k_data',
-    '15': 'odl_15_history_A_stock_k_data',
-    '30': 'odl_30_history_A_stock_k_data',
-    '60': 'odl_60_history_A_stock_k_data'
+
+frequency_odl_table_obj = {
+    'd': D_History_A_Stock_K_Data,
+    'w': W_History_A_Stock_K_Data,
+    'm': M_History_A_Stock_K_Data,
+    '5': T5_History_A_Stock_K_Data
+}
+
+frequency_bdl_table_obj = {
+    'd': DailyKData,
+    'w': WeeklyKData,
+    'm': MonthlyKData
+    #'5': T5_History_A_Stock_K_Data
 }

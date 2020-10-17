@@ -9,10 +9,10 @@ from coralquant.models.odl_model import stock_basic
 from coralquant.settings import CQ_Config
 from coralquant.models.orm_model import TaskTable
 from coralquant.stringhelper import TaskEnum
-from coralquant.database import engine, session_maker
+from coralquant.database import engine, session_maker,del_table_data
 from threading import Thread
 import concurrent.futures
-from coralquant.stringhelper import frequency_tablename
+from coralquant.stringhelper import frequency_odl_table_obj
 
 _logger = logger.Logger(__name__).get_log()
 
@@ -51,7 +51,10 @@ def _parse_data(content, ts_code, frequency):
     """
     解析数据，并保存
     """
-    table_name = frequency_tablename[frequency]
+    if content.empty:
+        return
+
+    table_name = frequency_odl_table_obj[frequency].__tablename__
 
     try:
         content['t_date']=[datetime.strptime(x,'%Y-%m-%d').date() for x in content.date]
@@ -67,14 +70,23 @@ def _query_history_k_data_plus(fields: str, frequency: str, adjustflag: str) -> 
     获取历史A股K线数据
     """
 
+    try:
+        taskEnum = TaskEnum(frequency)
+    except Exception as e:
+        _logger.error('获取历史A股K线数据/任务不存在，不能获取历史A股K线数据！')
+        return
+
+    #删除历史数据
+    del_table_data(frequency_odl_table_obj[frequency])
+
     #### 登陆系统 ####
     lg = bs.login()
 
     step = 1
     with concurrent.futures.ThreadPoolExecutor() as executor:
         with session_maker() as sm:
-            rp = sm.query(TaskTable).filter(TaskTable.task == TaskEnum.获取历史A股K线数据.value,
-                                            TaskTable.finished == False)#.limit(2)
+            rp = sm.query(TaskTable).filter(TaskTable.task == taskEnum.value,
+                                            TaskTable.finished == False).limit(10)
             for task in rp:
                 if task.finished:
                     continue
@@ -92,11 +104,11 @@ def _query_history_k_data_plus(fields: str, frequency: str, adjustflag: str) -> 
                                                       frequency=frequency,
                                                       adjustflag=adjustflag)
                     if rs.error_code == '0':
-                        _logger.info('{}下载成功'.format(task.ts_code))
                         data_list = []
                         while (rs.error_code == '0') & rs.next():
                             # 获取一条记录，将记录合并在一起
                             data_list.append(rs.get_row_data())
+                        _logger.info('{}下载成功,数据{}条'.format(task.ts_code,len(data_list)))
                         result = pd.DataFrame(data_list, columns=rs.fields)
                         executor.submit(_parse_data, result, task.ts_code, frequency)
                         task.finished = True
@@ -112,6 +124,9 @@ def _query_history_k_data_plus(fields: str, frequency: str, adjustflag: str) -> 
             sm.commit()
     #### 登出系统 ####
     bs.logout()
+
+
+
 
 
 def init_history_k_data_plus(frequency, adjustflag="3"):
