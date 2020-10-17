@@ -1,3 +1,4 @@
+from datetime import datetime
 import baostock as bs
 import pandas as pd
 from sqlalchemy import select
@@ -46,13 +47,16 @@ def get_task_list():
     return task_list
 
 
-def _parse_data(content, ts_code, frequency, is_first):
+def _parse_data(content, ts_code, frequency):
     """
     解析数据，并保存
     """
     table_name = frequency_tablename[frequency]
 
     try:
+        t_datelist=[datetime.strptime(x,'%Y-%m-%d').date() for x in content.date]
+        t_dateseries = pd.Series(t_datelist,content.date.index)
+        content['t_date']=t_dateseries
         content.to_sql(table_name, engine, schema='stock_dw', if_exists='append', index=False)
     except Exception as e:
         _logger.error('{}保存出错：{}'.format(ts_code, traceback.format_exc(1)))
@@ -72,7 +76,7 @@ def _query_history_k_data_plus(fields: str, frequency: str, adjustflag: str) -> 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         with session_maker() as sm:
             rp = sm.query(TaskTable).filter(TaskTable.task == TaskEnum.获取历史A股K线数据.value,
-                                            TaskTable.finished == False)#.limit(20)
+                                            TaskTable.finished == False)#.limit(2)
             for task in rp:
                 if task.finished:
                     continue
@@ -96,8 +100,7 @@ def _query_history_k_data_plus(fields: str, frequency: str, adjustflag: str) -> 
                             # 获取一条记录，将记录合并在一起
                             data_list.append(rs.get_row_data())
                         result = pd.DataFrame(data_list, columns=rs.fields)
-                        is_first = True if step == 1 else False
-                        executor.submit(_parse_data, result, task.ts_code, frequency, is_first)
+                        executor.submit(_parse_data, result, task.ts_code, frequency)
                         task.finished = True
                         step += 1
                         break
