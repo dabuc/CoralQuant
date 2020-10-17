@@ -54,12 +54,10 @@ def _parse_data(content, ts_code, frequency):
     table_name = frequency_tablename[frequency]
 
     try:
-        t_datelist=[datetime.strptime(x,'%Y-%m-%d').date() for x in content.date]
-        t_dateseries = pd.Series(t_datelist,content.date.index)
-        content['t_date']=t_dateseries
+        content['t_date']=[datetime.strptime(x,'%Y-%m-%d').date() for x in content.date]
         content.to_sql(table_name, engine, schema='stock_dw', if_exists='append', index=False)
-    except Exception as e:
-        _logger.error('{}保存出错：{}'.format(ts_code, traceback.format_exc(1)))
+    except Exception as e:#traceback.format_exc(1)
+        _logger.error('{}保存出错/{}'.format(ts_code, repr(e)))
     else:
         _logger.info('{}保存成功'.format(ts_code))
 
