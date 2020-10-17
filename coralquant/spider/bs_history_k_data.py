@@ -86,7 +86,7 @@ def _query_history_k_data_plus(fields: str, frequency: str, adjustflag: str) -> 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         with session_maker() as sm:
             rp = sm.query(TaskTable).filter(TaskTable.task == taskEnum.value,
-                                            TaskTable.finished == False).limit(10)
+                                            TaskTable.finished == False)#.limit(10)
             for task in rp:
                 if task.finished:
                     continue
