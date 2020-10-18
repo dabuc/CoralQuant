@@ -2,7 +2,7 @@
 """数据仓库管理工具"""
 import click
 from coralquant.database import engine
-from coralquant.models import bdl_model, odl_model,orm_model
+from coralquant.models import bdl_model, odl_model,orm_model,dim_model
 from coralquant.settings import CQ_Config
 
 
@@ -39,6 +39,7 @@ def create_dw():
     odl_model.Base.metadata.create_all(engine)
     bdl_model.Base.metadata.create_all(engine)
     orm_model.Base.metadata.create_all(engine)
+    dim_model.Base.metadata.create_all(engine)
 
 
     click.echo("数据层数据表创建完成")
