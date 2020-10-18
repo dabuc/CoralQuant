@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """命令工具"""
+from coralquant.models.dim_model import DIM_Date
+from coralquant.database import del_table_data
 from coralquant.taskmanage import update_task_table
 from coralquant.stringhelper import TaskEnum
 from datetime import datetime
@@ -86,6 +88,14 @@ def create_task(n, bd, ed, t, s, d):
 
     taskmanage.create_task(taskEnum, begin_date, end_date, type=t, status=s,isdel=d)
     click.echo("任务创建成功")
+
+@cli.command()
+def init_dim_date():
+    """
+    初始化日期维度表
+    """
+    del_table_data(DIM_Date)
+    DIM_Date.init_data()
 
 
 def main():

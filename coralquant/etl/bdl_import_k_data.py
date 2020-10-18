@@ -1,13 +1,11 @@
-import math
-from coralquant.database import session_maker, get_new_session
-from coralquant.models.odl_model import D_History_A_Stock_K_Data, M_History_A_Stock_K_Data, T5_History_A_Stock_K_Data, W_History_A_Stock_K_Data
-from datetime import datetime
-import decimal
-
-from coralquant.models.bdl_model import DailyKData, WeeklyKData, MonthlyKData
-from coralquant.stringhelper import frequency_odl_table_obj,frequency_bdl_table_obj
-from coralquant import logger
 import concurrent.futures
+import decimal
+from datetime import datetime
+
+from coralquant import logger
+from coralquant.database import get_new_session, session_maker
+from coralquant.stringhelper import (frequency_bdl_table_obj,
+                                     frequency_odl_table_obj)
 from sqlalchemy.sql import func
 
 _logger = logger.Logger(__name__).get_log()
