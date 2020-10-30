@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 """股票列表"""
+from coralquant.models.odl_model import TS_Stock_Basic
 from coralquant.database import engine
 from coralquant.settings import CQ_Config
-from coralquant.models.odl_model import stock_basic
 import tushare as ts
 import pandas as pd
-from sqlalchemy import delete
-
+from coralquant.database import del_table_data
 
 def convert_to_bscode(ts_code):
     """
@@ -24,6 +23,10 @@ def get_stock_basic():
     获取股票列表
     """
 
+    #清空原有数据
+    del_table_data(TS_Stock_Basic)
+
+
     pro = ts.pro_api(CQ_Config.TUSHARE_TOKEN)
     #查询当前所有正常上市交易的股票列表
 
@@ -40,7 +43,7 @@ def get_stock_basic():
     result.to_sql('odl_ts_stock_basic',
                 engine,
                 schema='stock_dw',
-                if_exists='replace',
+                if_exists='append',
                 index=False)
 
 

@@ -1,16 +1,11 @@
 from datetime import datetime
 import baostock as bs
 import pandas as pd
-from sqlalchemy import select
-import traceback
 import time
 from coralquant import logger
-from coralquant.models.odl_model import stock_basic
-from coralquant.settings import CQ_Config
 from coralquant.models.orm_model import TaskTable
 from coralquant.stringhelper import TaskEnum
 from coralquant.database import engine, session_maker,del_table_data
-from threading import Thread
 import concurrent.futures
 from coralquant.stringhelper import frequency_odl_table_obj
 
@@ -31,20 +26,20 @@ frequency_fields = {
 }
 
 
-def get_task_list():
-    """
-    获取股票列表
-    """
-    s = select([stock_basic.c.ts_code]).where(stock_basic.c.list_status == 'L')
-    rp = engine.execute(s)
-    task_list = []
-    for row in rp:
-        a = row[0].split('.')
-        code = '{}.{}'.format(a[1].lower(), a[0])
-        iscmpl = False
-        task = [code, iscmpl]
-        task_list.append(task)
-    return task_list
+# def get_task_list():
+#     """
+#     获取股票列表
+#     """
+#     s = select([stock_basic.c.ts_code]).where(stock_basic.c.list_status == 'L')
+#     rp = engine.execute(s)
+#     task_list = []
+#     for row in rp:
+#         a = row[0].split('.')
+#         code = '{}.{}'.format(a[1].lower(), a[0])
+#         iscmpl = False
+#         task = [code, iscmpl]
+#         task_list.append(task)
+#     return task_list
 
 
 def _parse_data(content, ts_code, frequency):
@@ -86,7 +81,7 @@ def _query_history_k_data_plus(fields: str, frequency: str, adjustflag: str) -> 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         with session_maker() as sm:
             rp = sm.query(TaskTable).filter(TaskTable.task == taskEnum.value,
-                                            TaskTable.finished == False)#.limit(10)
+                                            TaskTable.finished == False).limit(10)
             for task in rp:
                 if task.finished:
                     continue
