@@ -10,6 +10,7 @@ from coralquant.etl import bdl_import_k_data
 import click
 from coralquant.spider import ts_stock_basic
 from coralquant.spider import bs_stock_basic
+from coralquant.spider import ts_trade_cal
 from coralquant.spider.bs_history_k_data import init_history_k_data_plus
 
 
@@ -36,9 +37,9 @@ def update_bs_stock_basic():
 
 
 @cli.command()
-@click.option('-f', type=click.Choice(['d', 'w', 'm','5']), prompt=True, help='d：日线数据，w：周线数据，m：月线数据')
+@click.option('-f', type=click.Choice(['d', 'w', 'm', '5']), prompt=True, help='d：日线数据，w：周线数据，m：月线数据')
 @click.pass_context
-def init_history_k_data(ctx,f):
+def init_history_k_data(ctx, f):
     """创建新的任务列表，初始化历史k线数据
     """
     click.confirm("正在初始化 {}-历史k线数据，是否继续？".format(f), abort=True)
@@ -49,12 +50,13 @@ def init_history_k_data(ctx,f):
     init_history_k_data_plus(f)
     click.echo("{}-线数据初始化完成。".format(f))
 
+
 @cli.command()
-@click.option('-f', type=click.Choice(['d', 'w', 'm','5']), prompt=True, help='d：日线数据，w：周线数据，m：月线数据')
+@click.option('-f', type=click.Choice(['d', 'w', 'm', '5']), prompt=True, help='d：日线数据，w：周线数据，m：月线数据')
 def update_history_k_data(f):
     """创建新的任务列表，更新历史k线数据
     """
-    taskEnum= TaskEnum(f)
+    taskEnum = TaskEnum(f)
     click.confirm("准备更新-{}，是否继续？".format(taskEnum.name), abort=True)
     #更新任务
     update_task_table(taskEnum)
@@ -86,8 +88,9 @@ def create_task(n, bd, ed, t, s, d):
     begin_date = datetime.strptime(bd, "%Y-%m-%d").date()
     end_date = datetime.strptime(ed, "%Y-%m-%d").date()
 
-    taskmanage.create_task(taskEnum, begin_date, end_date, type=t, status=s,isdel=d)
+    taskmanage.create_task(taskEnum, begin_date, end_date, type=t, status=s, isdel=d)
     click.echo("任务创建成功")
+
 
 @cli.command()
 def init_dim_date():
@@ -96,6 +99,15 @@ def init_dim_date():
     """
     del_table_data(DIM_Date)
     DIM_Date.init_data()
+
+
+@cli.command()
+def create_cal_date():
+    """
+    创建交易日历
+    """
+    ts_trade_cal.create_cal_date()
+    click.echo("创建交易日历完成")
 
 
 def main():
