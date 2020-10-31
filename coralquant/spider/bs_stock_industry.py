@@ -1,11 +1,7 @@
 import baostock as bs
 import pandas as pd
-from datetime import datetime as dt
 from coralquant.database import engine
-from coralquant.settings import CQ_Config
-from sqlalchemy import Boolean, Date, String, Integer
-
-
+from sqlalchemy import String
 
 
 def create_stock_industry():
