@@ -29,7 +29,7 @@ def create_stock_industry():
     dtype = {
         'updateDate': String(10),
         'code': String(9),
-        'code_name': String(6),
+        'code_name': String(10),
         'industry': String(4),
         'industryClassification': String(6)
     }
