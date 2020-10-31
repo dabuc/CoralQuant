@@ -9,7 +9,7 @@ from coralquant import taskmanage
 from coralquant.etl import bdl_import_k_data
 import click
 from coralquant.spider import ts_stock_basic,ts_trade_cal
-from coralquant.spider import bs_stock_basic,bs_stock_industry,bs_hs300_stocks
+from coralquant.spider import bs_stock_basic,bs_stock_industry,bs_hs300_stocks,bs_zz500_stocks
 from coralquant.spider.bs_history_k_data import init_history_k_data_plus
 
 
@@ -125,6 +125,16 @@ def get_hs300_stocks():
 
     bs_hs300_stocks.get_hs300_stocks()
     click.echo("获取沪深300成分股完成")
+
+@cli.command()
+def get_zz500_stocks():
+    """
+    获取中证500成分股
+    """
+
+    bs_zz500_stocks.get_zz500_stocks()
+    click.echo("获取中证500成分股完成")
+
 
 
 def main():
