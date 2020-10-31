@@ -8,9 +8,8 @@ from datetime import datetime
 from coralquant import taskmanage
 from coralquant.etl import bdl_import_k_data
 import click
-from coralquant.spider import ts_stock_basic
-from coralquant.spider import bs_stock_basic
-from coralquant.spider import ts_trade_cal
+from coralquant.spider import ts_stock_basic,ts_trade_cal
+from coralquant.spider import bs_stock_basic,bs_stock_industry
 from coralquant.spider.bs_history_k_data import init_history_k_data_plus
 
 
@@ -108,6 +107,15 @@ def create_cal_date():
     """
     ts_trade_cal.create_cal_date()
     click.echo("创建交易日历完成")
+
+@cli.command()
+def create_stock_industry():
+    """
+    创建行业分类
+    """
+    bs_stock_industry.create_stock_industry()
+    click.echo("创建行业分类完成")
+
 
 
 def main():
