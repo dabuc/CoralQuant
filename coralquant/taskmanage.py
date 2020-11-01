@@ -17,9 +17,9 @@ meta = MetaData()
 def update_task_table(task: TaskEnum):
     """
     更新任务表
-    1.获取最新bs-A股股票列表
-    2.创建任务表
-    3，根据依据导入的数据，更新任务表时间
+        1.获取最新bs-A股股票列表
+        2.创建任务表
+        3.根据依据导入的数据，更新任务表时间
     """
     get_stock_basic()
 
@@ -60,7 +60,7 @@ def create_task(task: TaskEnum,
 
     if not codes:
         tmp = Table('odl_bs_stock_basic', meta, autoload=True, autoload_with=engine)
-        s = select([tmp.c.code])
+        s = select([tmp.c.code, tmp.c.ipoDate])
         if status:
             s = s.where(tmp.c.status == status)
         if type:
@@ -90,5 +90,6 @@ def create_task(task: TaskEnum,
 
     _logger.info('生成{}条任务记录'.format(len(codes)))
 
-    if __name__ == "__main__":
-        pass
+
+if __name__ == "__main__":
+    pass

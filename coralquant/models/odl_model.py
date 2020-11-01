@@ -142,5 +142,27 @@ class T5_History_A_Stock_K_Data(Base):
     adjustflag = Column('adjustflag', String(1))
 
 
+#-------财务数据----------
+
+class Profit_Data(Base):
+    """
+    季频盈利能力
+    """
+    __tablename__ = "odl_bs_profit_data"
+    id = Column('id', BigInteger, primary_key=True)
+    code = Column('code', String(10)) #证券代码	
+    pubDate= Column('pubDate', String(10)) #公司发布财报的日期
+    statDate= Column('statDate', String(10)) #财报统计的季度的最后一天, 比如2017-03-31, 2017-06-30	
+    roeAvg = Column('roeAvg', String(23)) #净资产收益率(平均)(%)
+    npMargin= Column('npMargin', String(23)) #销售净利率(%)
+    gpMargin= Column('gpMargin', String(23)) #销售毛利率(%)
+    netProfit= Column('netProfit', String(23)) #净利润(元)
+    epsTTM= Column('epsTTM', String(23)) #每股收益
+    MBRevenue= Column('MBRevenue', String(23)) #主营营业收入(元)
+    totalShare= Column('totalShare', String(23)) #总股本
+    liqaShare= Column('liqaShare', String(23)) #流通股本
+
+
+
 if __name__ == "__main__":
     pass
