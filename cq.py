@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 """命令工具"""
-from coralquant.models.dim_model import DIM_Date
-from coralquant.database import del_table_data
-from coralquant.taskmanage import update_task_table
-from coralquant.stringhelper import TaskEnum
 from datetime import datetime
-from coralquant import taskmanage
-from coralquant.etl import bdl_import_k_data
+
 import click
-from coralquant.spider import ts_stock_basic,ts_trade_cal,bs_profit_data
-from coralquant.spider import bs_stock_basic,bs_stock_industry,bs_hs300_stocks,bs_zz500_stocks
+
+from coralquant import taskmanage
+from coralquant.database import del_table_data
+from coralquant.etl import bdl_import_k_data,bdl_import_Profit_Data
+from coralquant.models.dim_model import DIM_Date
+from coralquant.spider import (bs_hs300_stocks, bs_profit_data, bs_stock_basic,
+                               bs_stock_industry, bs_zz500_stocks,
+                               ts_stock_basic, ts_trade_cal)
 from coralquant.spider.bs_history_k_data import init_history_k_data_plus
+from coralquant.stringhelper import TaskEnum
+from coralquant.taskmanage import update_task_table
 
 
 @click.group()
@@ -144,6 +147,16 @@ def get_profit_data():
     bs_profit_data.create_profit_data_task()
     bs_profit_data.get_profit_data()
     click.echo("获取季频盈利能力数据完成")
+
+@cli.command()
+def ETL_Profit_Data():
+    """
+    到入季频盈利能力数据到基础数据层
+    """
+    click.confirm("正在导入季频盈利能力数据，是否继续？", abort=True)
+    bdl_import_Profit_Data.import_data()
+
+    click.echo("到入季频盈利能力数据完成")
 
 def main():
     cli()

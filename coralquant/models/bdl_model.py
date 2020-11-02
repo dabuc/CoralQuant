@@ -9,15 +9,14 @@ from sqlalchemy import (BigInteger, Boolean, Column, Date, DateTime, Enum, Float
                         Numeric, String, Table)
 
 
-
 class DailyKData(Base):
     """
     日线数据
     """
     __tablename__ = "bdl_bs_daily_k_data"
-    id = Column( BigInteger, primary_key=True)
-    date = Column( Date, nullable=False)  #交易所行情日期
-    code = Column( String(10), nullable=False)  #证券代码
+    id = Column(BigInteger, primary_key=True)
+    date = Column(Date, nullable=False)  #交易所行情日期
+    code = Column(String(10), nullable=False)  #证券代码
     open = Column('open', Numeric(12, 4), nullable=False)  #今开盘价格
     high = Column('high', Numeric(12, 4), nullable=False)  #最高价
     low = Column('low', Numeric(12, 4), nullable=False)  #最低价
@@ -41,7 +40,7 @@ class WeeklyKData(Base):
     周线数据
     """
     __tablename__ = "bdl_bs_weekly_k_data"
-    id = Column( BigInteger, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     date = Column('date', Date, nullable=False)  #交易所行情日期
     code = Column('code', String(10), nullable=False)  #证券代码
     open = Column('open', Numeric(12, 4), nullable=False)  #今开盘价格
@@ -72,6 +71,25 @@ class MonthlyKData(Base):
     adjustflag = Column('adjustflag', Enum('1', '2', '3'), nullable=False)  #复权状态
     turn = Column('turn', Float, nullable=False)  #换手率
     pctChg = Column('pctChg', Float, nullable=False)  #涨跌幅（百分比）
+
+
+class quarterly_Profit_Data(Base):
+    """
+    季频盈利能力
+    """
+    __tablename__ = "bdl_bs_profit_data"
+    id = Column('id', BigInteger, primary_key=True)
+    code = Column('code', String(10), nullable=False)  #证券代码
+    pubDate = Column('pubDate', Date, nullable=False)  #公司发布财报的日期
+    statDate = Column('statDate', Date, nullable=False)  #财报统计的季度的最后一天, 比如2017-03-31, 2017-06-30
+    roeAvg = Column('roeAvg', Numeric(15, 6), nullable=False)  #净资产收益率(平均)(%)
+    npMargin = Column('npMargin', Numeric(15, 6), nullable=False)  #销售净利率(%)
+    gpMargin = Column('gpMargin', Numeric(15, 6), nullable=False)  #销售毛利率(%)
+    netProfit = Column('netProfit', Numeric(23, 6), nullable=False)  #净利润(元)
+    epsTTM = Column('epsTTM', Numeric(15, 6), nullable=False)  #每股收益
+    MBRevenue = Column('MBRevenue', Numeric(23, 6), nullable=False)  #主营营业收入(元)
+    totalShare = Column('totalShare', Numeric(23, 2), nullable=False)  #总股本
+    liqaShare = Column('liqaShare', Numeric(23, 2), nullable=False)  #流通股本
 
 
 if __name__ == "__main__":
