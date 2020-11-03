@@ -11,6 +11,7 @@ class TaskEnum(Enum):
     日线历史A股K线数据 = 'd'
     周线历史A股K线数据 = 'w'
     月线历史A股K线数据 = 'm'
+    T5分钟线历史A股K线数据 = '5'
     季频盈利能力 = 'profit'
 
 

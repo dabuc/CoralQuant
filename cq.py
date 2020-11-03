@@ -46,9 +46,17 @@ def init_history_k_data(ctx, f, a):
     """
     click.confirm("正在初始化 {}-{} 历史k线数据，是否继续？".format(f,a), abort=True)
     #创建任务
-    ctx.invoke(create_task, n=TaskEnum.日线历史A股K线数据.value, bd='1990-12-19', t=1, d=1)
-    ctx.invoke(create_task, n=TaskEnum.日线历史A股K线数据.value, bd='1990-12-19', t=2, d=0)
+    if f=='d':
+        taskvalue = TaskEnum.日线历史A股K线数据.value
+    elif f=='w':
+        taskvalue = TaskEnum.周线历史A股K线数据.value
+    elif f=='m':
+        taskvalue = TaskEnum.月线历史A股K线数据.value
+    else:
+        taskvalue = TaskEnum.T5分钟线历史A股K线数据.value
 
+    ctx.invoke(create_task, n=taskvalue, bd='1990-12-19', t=1, d=1)
+    ctx.invoke(create_task, n=taskvalue, bd='1990-12-19', t=2, d=0)
     init_history_k_data_plus(f,a)
     click.echo("{}-{} 线数据初始化完成。".format(f,a))
 
