@@ -6,10 +6,9 @@ import click
 
 from coralquant import taskmanage
 from coralquant.database import del_table_data
-from coralquant.etl import bdl_import_k_data,bdl_import_Profit_Data
+from coralquant.etl import bdl_import_k_data, bdl_import_Profit_Data
 from coralquant.models.dim_model import DIM_Date
-from coralquant.spider import (bs_hs300_stocks, bs_profit_data, bs_stock_basic,
-                               bs_stock_industry, bs_zz500_stocks,
+from coralquant.spider import (bs_hs300_stocks, bs_profit_data, bs_stock_basic, bs_stock_industry, bs_zz500_stocks,
                                ts_stock_basic, ts_trade_cal)
 from coralquant.spider.bs_history_k_data import init_history_k_data_plus
 from coralquant.stringhelper import TaskEnum
@@ -40,17 +39,18 @@ def update_bs_stock_basic():
 
 @cli.command()
 @click.option('-f', type=click.Choice(['d', 'w', 'm', '5']), prompt=True, help='d：日线数据，w：周线数据，m：月线数据')
+@click.option('-a', type=click.Choice(['1', '2', '3']), default='3', help='1：后复权；2：前复权; 3：不复权；默认不复权')
 @click.pass_context
-def init_history_k_data(ctx, f):
+def init_history_k_data(ctx, f, a):
     """创建新的任务列表，初始化历史k线数据
     """
-    click.confirm("正在初始化 {}-历史k线数据，是否继续？".format(f), abort=True)
+    click.confirm("正在初始化 {}-{} 历史k线数据，是否继续？".format(f,a), abort=True)
     #创建任务
     ctx.invoke(create_task, n=TaskEnum.日线历史A股K线数据.value, bd='1990-12-19', t=1, d=1)
     ctx.invoke(create_task, n=TaskEnum.日线历史A股K线数据.value, bd='1990-12-19', t=2, d=0)
 
-    init_history_k_data_plus(f)
-    click.echo("{}-线数据初始化完成。".format(f))
+    init_history_k_data_plus(f,a)
+    click.echo("{}-{} 线数据初始化完成。".format(f,a))
 
 
 @cli.command()
@@ -111,6 +111,7 @@ def create_cal_date():
     ts_trade_cal.create_cal_date()
     click.echo("创建交易日历完成")
 
+
 @cli.command()
 def create_stock_industry():
     """
@@ -129,6 +130,7 @@ def get_hs300_stocks():
     bs_hs300_stocks.get_hs300_stocks()
     click.echo("获取沪深300成分股完成")
 
+
 @cli.command()
 def get_zz500_stocks():
     """
@@ -137,6 +139,7 @@ def get_zz500_stocks():
 
     bs_zz500_stocks.get_zz500_stocks()
     click.echo("获取中证500成分股完成")
+
 
 @cli.command()
 def get_profit_data():
@@ -148,6 +151,7 @@ def get_profit_data():
     bs_profit_data.get_profit_data()
     click.echo("获取季频盈利能力数据完成")
 
+
 @cli.command()
 def ETL_Profit_Data():
     """
@@ -157,6 +161,7 @@ def ETL_Profit_Data():
     bdl_import_Profit_Data.import_data()
 
     click.echo("到入季频盈利能力数据完成")
+
 
 def main():
     cli()

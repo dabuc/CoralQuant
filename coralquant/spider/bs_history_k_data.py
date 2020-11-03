@@ -5,7 +5,7 @@ import time
 from coralquant import logger
 from coralquant.models.orm_model import TaskTable
 from coralquant.stringhelper import TaskEnum
-from coralquant.database import engine, session_maker,del_table_data
+from coralquant.database import engine, session_maker, del_table_data
 import concurrent.futures
 from coralquant.stringhelper import frequency_odl_table_obj
 
@@ -26,35 +26,25 @@ frequency_fields = {
 }
 
 
-# def get_task_list():
-#     """
-#     获取股票列表
-#     """
-#     s = select([stock_basic.c.ts_code]).where(stock_basic.c.list_status == 'L')
-#     rp = engine.execute(s)
-#     task_list = []
-#     for row in rp:
-#         a = row[0].split('.')
-#         code = '{}.{}'.format(a[1].lower(), a[0])
-#         iscmpl = False
-#         task = [code, iscmpl]
-#         task_list.append(task)
-#     return task_list
-
-
-def _parse_data(content, ts_code, frequency):
+def _parse_data(content, ts_code, frequency, adjustflag):
     """
     解析数据，并保存
     """
     if content.empty:
         return
+    
+    if adjustflag !='3':
+        table_name_key = '{}-{}'.format(frequency,adjustflag)
+    else:
+        table_name_key = frequency
 
-    table_name = frequency_odl_table_obj[frequency].__tablename__
+
+    table_name = frequency_odl_table_obj[table_name_key].__tablename__
 
     try:
-        content['t_date']=[datetime.strptime(x,'%Y-%m-%d').date() for x in content.date]
+        content['t_date'] = [datetime.strptime(x, '%Y-%m-%d').date() for x in content.date]
         content.to_sql(table_name, engine, schema='stock_dw', if_exists='append', index=False)
-    except Exception as e:#traceback.format_exc(1)
+    except Exception as e:  #traceback.format_exc(1)
         _logger.error('{}保存出错/{}'.format(ts_code, repr(e)))
     else:
         _logger.info('{}保存成功'.format(ts_code))
@@ -80,8 +70,7 @@ def _query_history_k_data_plus(fields: str, frequency: str, adjustflag: str) -> 
     step = 1
     with concurrent.futures.ThreadPoolExecutor() as executor:
         with session_maker() as sm:
-            rp = sm.query(TaskTable).filter(TaskTable.task == taskEnum.value,
-                                            TaskTable.finished == False)
+            rp = sm.query(TaskTable).filter(TaskTable.task == taskEnum.value, TaskTable.finished == False)
             for task in rp:
                 if task.finished:
                     continue
@@ -103,9 +92,9 @@ def _query_history_k_data_plus(fields: str, frequency: str, adjustflag: str) -> 
                         while (rs.error_code == '0') & rs.next():
                             # 获取一条记录，将记录合并在一起
                             data_list.append(rs.get_row_data())
-                        _logger.info('{}下载成功,数据{}条'.format(task.ts_code,len(data_list)))
+                        _logger.info('{}下载成功,数据{}条'.format(task.ts_code, len(data_list)))
                         result = pd.DataFrame(data_list, columns=rs.fields)
-                        executor.submit(_parse_data, result, task.ts_code, frequency)
+                        executor.submit(_parse_data, result, task.ts_code, frequency, adjustflag)
                         task.finished = True
                         step += 1
                         break
@@ -119,9 +108,6 @@ def _query_history_k_data_plus(fields: str, frequency: str, adjustflag: str) -> 
             sm.commit()
     #### 登出系统 ####
     bs.logout()
-
-
-
 
 
 def init_history_k_data_plus(frequency, adjustflag="3"):
