@@ -1,7 +1,7 @@
 from sqlalchemy.sql.schema import Index
 from coralquant import logger
 from datetime import date
-from coralquant.database import Base, session_maker
+from coralquant.database import Base, session_scope
 from sqlalchemy import Integer, Column, Date, SmallInteger, String
 import datetime as dt
 
@@ -33,7 +33,7 @@ class DIM_Date(Base):
             date_list.append(begin_date)
             begin_date += dt.timedelta(1)
 
-        with session_maker() as sn:
+        with session_scope() as sn:
             for tmpdate in date_list:
                 row = DIM_Date(idate=tmpdate.year * 10000 + tmpdate.month * 100 + tmpdate.day,
                                date=tmpdate,

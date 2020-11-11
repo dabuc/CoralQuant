@@ -40,25 +40,31 @@ def update_bs_stock_basic():
 @cli.command()
 @click.option('-f', type=click.Choice(['d', 'w', 'm', '5']), prompt=True, help='d：日线数据，w：周线数据，m：月线数据')
 @click.option('-a', type=click.Choice(['1', '2', '3']), default='3', help='1：后复权；2：前复权; 3：不复权；默认不复权')
+@click.option('-m', type=click.Choice(['主板', '中小板', '创业板', 'NULL', '']), default='', help='选择市场板块')
 @click.pass_context
-def init_history_k_data(ctx, f, a):
+def init_history_k_data(ctx, f, a, m):
     """创建新的任务列表，初始化历史k线数据
     """
-    click.confirm("正在初始化 {}-{} 历史k线数据，是否继续？".format(f,a), abort=True)
+    click.confirm("正在初始化 {}-{} 历史k线数据，是否继续？".format(f, a), abort=True)
     #创建任务
-    if f=='d':
+    if f == 'd':
         taskvalue = TaskEnum.日线历史A股K线数据.value
-    elif f=='w':
+    elif f == 'w':
         taskvalue = TaskEnum.周线历史A股K线数据.value
-    elif f=='m':
+    elif f == 'm':
         taskvalue = TaskEnum.月线历史A股K线数据.value
     else:
         taskvalue = TaskEnum.T5分钟线历史A股K线数据.value
 
-    ctx.invoke(create_task, n=taskvalue, bd='1990-12-19', t=1, d=1)
-    ctx.invoke(create_task, n=taskvalue, bd='1990-12-19', t=2, d=0)
-    init_history_k_data_plus(f,a)
-    click.echo("{}-{} 线数据初始化完成。".format(f,a))
+    if m == '':
+        ctx.invoke(create_task, n=taskvalue, bd='1990-12-19', t=1, d=1)
+        ctx.invoke(create_task, n=taskvalue, bd='1990-12-19', t=2, d=0)
+    else:
+        ctx.invoke(create_task, n=taskvalue, bd='1990-12-19', t=1, m=m, d=1)
+        ctx.invoke(create_task, n=taskvalue, bd='1990-12-19', t=2, m=m, d=0)
+
+    init_history_k_data_plus(f, a)
+    click.echo("{}-{} 线数据初始化完成。".format(f, a))
 
 
 @cli.command()
@@ -76,11 +82,12 @@ def update_history_k_data(f):
 
 @cli.command()
 @click.option('-f', type=click.Choice(['d', 'w', 'm']), prompt=True, help='d：日线数据，w：导入周线数据，m：导入月线数据')
-def import_dwm_data(f):
+@click.option('-a', type=click.Choice(['1', '2', '3']), default='3', help='1：后复权；2：前复权; 3：不复权；默认不复权')
+def import_dwm_data(f, a):
     """导入K线数据
     """
     click.confirm("正在导入导入ODL-k线数据，是否继续？", abort=True)
-    bdl_import_k_data.import_data(f)
+    bdl_import_k_data.import_data(f, a)
     click.echo("ODL周月线数据导入完成。")
 
 
@@ -90,15 +97,19 @@ def import_dwm_data(f):
 @click.option('-ed', type=click.STRING, default=datetime.now().strftime("%Y-%m-%d"), help='结束时间,默认今天')
 @click.option('-t', type=click.STRING, help='证券类型，其中1：股票，2：指数,3：其它')
 @click.option('-s', type=click.STRING, help='上市状态，其中1：上市，0：退市')
+@click.option('-m', type=click.Choice(['主板', '中小板', '创业板', 'NULL', '']), default='', help='选择市场板块')
 @click.option('-d', type=click.BOOL, default=False, help='是否删除历史相同的任务，默认否')
-def create_task(n, bd, ed, t, s, d):
+def create_task(n, bd, ed, t, s, m, d):
     """创建任务
     """
     taskEnum = TaskEnum(n)
     begin_date = datetime.strptime(bd, "%Y-%m-%d").date()
     end_date = datetime.strptime(ed, "%Y-%m-%d").date()
 
-    taskmanage.create_task(taskEnum, begin_date, end_date, type=t, status=s, isdel=d)
+    if m == '':
+        taskmanage.create_task(taskEnum, begin_date, end_date, type=t, status=s, isdel=d)
+    else:
+        taskmanage.create_task(taskEnum, begin_date, end_date, type=t, status=s, market=m, isdel=d)
     click.echo("任务创建成功")
 
 
@@ -173,8 +184,9 @@ def ETL_Profit_Data():
 
 def main():
     cli()
+    #update_ts_stock_basic()
     #import_dwm_data(['-f','d'])
-    #init_history_k_data(['-f','d'])
+    #init_history_k_data(['-f','d','-a','2','-m','创业板'])
     #update_history_k_data(['-f','d'])
     #create_task(['-n','d', '-bd','1990-12-19', '-t', '1', '-d','1'])
 

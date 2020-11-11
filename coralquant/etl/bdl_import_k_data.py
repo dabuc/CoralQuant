@@ -1,38 +1,14 @@
 import concurrent.futures
+from coralquant.util.dataconvert import get_decimal_from_str, get_float_from_str, get_int_from_str
 import decimal
 from datetime import datetime
 
 from coralquant import logger
-from coralquant.database import get_new_session, session_maker
-from coralquant.stringhelper import (frequency_bdl_table_obj,
-                                     frequency_odl_table_obj)
+from coralquant.database import  session_scope
+from coralquant.stringhelper import (frequency_bdl_table_obj, frequency_odl_table_obj)
 from sqlalchemy.sql import func
 
 _logger = logger.Logger(__name__).get_log()
-
-
-def get_decimal_from_str(str):
-    """
-    字符串转Decimal
-    """
-    r = 0 if str == "" else decimal.Decimal(str)
-    return r
-
-
-def get_int_from_str(str):
-    """
-    字符串转int
-    """
-    r = 0 if str == "" else int(str)
-    return r
-
-
-def get_float_from_str(str):
-    """
-    字符串转float
-    """
-    r = 0 if str == "" else float(str)
-    return r
 
 
 def _build_result_data(rp, frequency):
@@ -66,17 +42,16 @@ def _build_result_data(rp, frequency):
     return result
 
 
-def _insert_data(data: list, frequency, pagenum):
+def _insert_data(data: list, frequency,table_name_key, pagenum):
     """
     导入数据
     """
-    session = get_new_session()
     ins_data = []
     num = 0  #计数
     try:
-        with session_maker(session) as session:
+        with session_scope() as session:
             for dic in data:
-                to_table = frequency_bdl_table_obj[frequency]()
+                to_table = frequency_bdl_table_obj[table_name_key]()
                 to_table.date = dic['date']
                 to_table.code = dic['code']
                 to_table.open = dic['open']
@@ -112,25 +87,21 @@ def _insert_data(data: list, frequency, pagenum):
         _logger.info("第{}页数据导入完成".format(pagenum))
 
 
-def getid(from_table, pos):
-    """
-    根据位置，获取对应的主键ID
-    """
-    with session_maker() as session:
-        #idlist[i*pagenum]
-        session.query(from_table.id).offset(pos).limit(1)
-
-
-def import_data(frequency: str):
+def import_data(frequency: str, adjustflag="3"):
     """
     导入日线数据
     """
     #offset：当偏移量大于800万时，offset limit模式性能下降严重，查询一次要12秒……
     #改成直接定位主键id查询。
 
-    from_table = frequency_odl_table_obj[frequency]
+    if adjustflag !='3':
+        table_name_key = '{}-{}'.format(frequency,adjustflag)
+    else:
+        table_name_key = frequency
+
+    from_table = frequency_odl_table_obj[table_name_key]
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        with session_maker() as session:
+        with session_scope() as session:
             onerow = session.query(func.min(from_table.id), func.max(from_table.id)).one()
             minid = onerow[0]
             maxid = onerow[1]
@@ -147,11 +118,11 @@ def import_data(frequency: str):
                     break
                 rp = session.query(from_table).filter(from_table.id >= ahead_id, from_table.id < next_id)
                 to_data = _build_result_data(rp, frequency)
-                executor.submit(_insert_data, to_data, frequency, i + 1)
+                executor.submit(_insert_data, to_data, frequency,table_name_key, i + 1)
                 i += 1
                 ahead_id = next_id
                 next_id = ahead_id + pagesize
-    
+
     _logger.info("数据导入完成")
 
 

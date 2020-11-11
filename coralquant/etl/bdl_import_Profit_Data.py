@@ -4,7 +4,7 @@ from coralquant.models.bdl_model import quarterly_Profit_Data
 from datetime import datetime
 
 from coralquant import logger
-from coralquant.database import get_new_session, session_maker
+from coralquant.database import session_scope
 from sqlalchemy.sql import func
 from coralquant.util import dataconvert as dc
 
@@ -51,11 +51,10 @@ def _insert_data(data: list, pagenum):
     """
     导入数据
     """
-    session = get_new_session()
     ins_data = []
     num = 0  #计数
     try:
-        with session_maker(session) as session:
+        with session_scope() as session:
             for dic in data:
                 to_table = _build_to_table(dic)
                 ins_data.append(to_table)
@@ -83,7 +82,7 @@ def import_data():
 
     from_table = Profit_Data
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        with session_maker() as session:
+        with session_scope() as session:
             onerow = session.query(func.min(from_table.id), func.max(from_table.id)).one()
             minid = onerow[0]
             maxid = onerow[1]

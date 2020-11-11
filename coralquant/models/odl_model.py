@@ -4,7 +4,7 @@
 """
 from datetime import datetime
 from sqlalchemy import MetaData, Table, Column, Integer, BigInteger, Numeric, String, Enum, Float, Boolean, Date, DateTime
-from coralquant.database import Base, get_new_session, session_maker
+from coralquant.database import Base, session_scope
 
 class TS_Stock_Basic(Base):
     """
@@ -24,7 +24,7 @@ class TS_Stock_Basic(Base):
     list_status = Column("list_status", String(1), nullable=False)  # 上市状态： L上市 D退市 P暂停上市
     list_date = Column("list_date", String(8))  # 上市日期
     delist_date = Column("delist_date", String(8))  # 退市日期
-    is_hs = Column("is_hs", String(1), nullable=False)  # 是否沪深港通标的，N否 H沪股通 S深股通
+    is_hs = Column("is_hs", String(1))  # 是否沪深港通标的，N否 H沪股通 S深股通
     bs_code = Column("bs_code", String(10), index=True)  # BS代码
 
 
@@ -46,7 +46,7 @@ class BS_Stock_Basic(Base):
         """
         删除全部数据
         """
-        with session_maker(get_new_session()) as session:
+        with session_scope() as session:
             session.query(BS_Stock_Basic).delete()
 
 

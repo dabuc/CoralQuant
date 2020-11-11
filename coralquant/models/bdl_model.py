@@ -9,11 +9,10 @@ from sqlalchemy import (BigInteger, Boolean, Column, Date, DateTime, Enum, Float
                         Numeric, String, Table)
 
 
-class DailyKData(Base):
+class DailyKDataBase():
     """
-    日线数据
+    日线数据基类
     """
-    __tablename__ = "bdl_bs_daily_k_data"
     id = Column(BigInteger, primary_key=True)
     date = Column(Date, nullable=False)  #交易所行情日期
     code = Column(String(10), nullable=False)  #证券代码
@@ -35,11 +34,10 @@ class DailyKData(Base):
     isST = Column('isST', Boolean, nullable=False)  #是否ST
 
 
-class WeeklyKData(Base):
+class WeeklyKDataBase():
     """
-    周线数据
+    周线数据基类
     """
-    __tablename__ = "bdl_bs_weekly_k_data"
     id = Column(BigInteger, primary_key=True)
     date = Column('date', Date, nullable=False)  #交易所行情日期
     code = Column('code', String(10), nullable=False)  #证券代码
@@ -54,11 +52,10 @@ class WeeklyKData(Base):
     pctChg = Column('pctChg', Float, nullable=False)  #涨跌幅（百分比）
 
 
-class MonthlyKData(Base):
+class MonthlyKDataBase():
     """
     月线数据
     """
-    __tablename__ = "bdl_bs_monthly_k_data"
     id = Column('id', BigInteger, primary_key=True)
     date = Column('date', Date, nullable=False)  #交易所行情日期
     code = Column('code', String(10), nullable=False)  #证券代码
@@ -71,6 +68,57 @@ class MonthlyKData(Base):
     adjustflag = Column('adjustflag', Enum('1', '2', '3'), nullable=False)  #复权状态
     turn = Column('turn', Float, nullable=False)  #换手率
     pctChg = Column('pctChg', Float, nullable=False)  #涨跌幅（百分比）
+
+
+#-------不复权-----------
+
+
+class DailyKData(DailyKDataBase, Base):
+    """
+    日线数据
+    """
+    __tablename__ = "bdl_bs_daily_k_data"
+
+
+class WeeklyKData(WeeklyKDataBase, Base):
+    """
+    周线数据
+    """
+    __tablename__ = "bdl_bs_weekly_k_data"
+
+
+class MonthlyKData(MonthlyKDataBase, Base):
+    """
+    月线数据
+    """
+    __tablename__ = "bdl_bs_monthly_k_data"
+
+
+#-------前复权-----------
+
+
+class DailyKData2(DailyKDataBase, Base):
+    """
+    日线数据
+    """
+    __tablename__ = "bdl_bs_daily_2k_data"
+
+
+class WeeklyKData2(WeeklyKDataBase, Base):
+    """
+    周线数据
+    """
+    __tablename__ = "bdl_bs_weekly_2k_data"
+
+
+class MonthlyKData2(MonthlyKDataBase, Base):
+    """
+    月线数据
+    """
+    __tablename__ = "bdl_bs_monthly_2k_data"
+
+
+#------财务数据----------------
 
 
 class quarterly_Profit_Data(Base):

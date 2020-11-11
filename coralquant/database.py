@@ -19,8 +19,6 @@ def get_new_session():
     session=Session()
     return session
 
-
-
 @contextmanager
 def session_maker(session=session):
     try:
@@ -33,11 +31,24 @@ def session_maker(session=session):
         session.close()
 
 
+@contextmanager
+def session_scope():
+    """Provide a transactional scope around a series of operations."""
+    session = Session()
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
 
 
 def del_table_data(table:Base):
     """
     清空指定表
     """
-    with session_maker() as sn:
+    with session_scope() as sn:
         sn.query(table).delete()

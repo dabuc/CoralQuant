@@ -8,7 +8,7 @@ from coralquant.taskmanage import create_task
 import baostock as bs
 import pandas as pd
 import concurrent.futures
-from coralquant.database import engine, session_maker
+from coralquant.database import engine, session_scope
 
 
 
@@ -47,7 +47,7 @@ def get_profit_data():
     print('login respond  error_msg:'+lg.error_msg)
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        with session_maker() as sm:
+        with session_scope() as sm:
             rp = sm.query(TaskTable).filter(TaskTable.task == TaskEnum.季频盈利能力.value,
                                             TaskTable.finished == False)
 

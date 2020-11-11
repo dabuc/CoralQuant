@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from coralquant.models.bdl_model import DailyKData, MonthlyKData, WeeklyKData
+from coralquant.models.bdl_model import DailyKData, DailyKData2, MonthlyKData, MonthlyKData2, WeeklyKData, WeeklyKData2
 from coralquant.models.odl_model import D2_History_A_Stock_K_Data, D_History_A_Stock_K_Data, M2_History_A_Stock_K_Data, M_History_A_Stock_K_Data, T52_History_A_Stock_K_Data, T5_History_A_Stock_K_Data, W2_History_A_Stock_K_Data, W_History_A_Stock_K_Data
 from enum import Enum,unique
 
@@ -31,6 +31,9 @@ frequency_odl_table_obj = {
 frequency_bdl_table_obj = {
     'd': DailyKData,
     'w': WeeklyKData,
-    'm': MonthlyKData
+    'm': MonthlyKData,
+    'd-2': DailyKData2,
+    'w-2': WeeklyKData2,
+    'm-2': MonthlyKData2
     #'5': T5_History_A_Stock_K_Data
 }
