@@ -22,8 +22,8 @@ class TS_Stock_Basic(Base):
     exchange = Column("exchange", String(4), nullable=False)  # 交易所代码
     curr_type = Column("curr_type", String(3))  # 交易货币
     list_status = Column("list_status", String(1), nullable=False)  # 上市状态： L上市 D退市 P暂停上市
-    list_date = Column("list_date", String(8))  # 上市日期
-    delist_date = Column("delist_date", String(8))  # 退市日期
+    list_date = Column("list_date", Date)  # 上市日期
+    delist_date = Column("delist_date", Date)  # 退市日期
     is_hs = Column("is_hs", String(1))  # 是否沪深港通标的，N否 H沪股通 S深股通
     bs_code = Column("bs_code", String(10), index=True)  # BS代码
 
@@ -35,8 +35,8 @@ class BS_Stock_Basic(Base):
     __tablename__ = "odl_bs_stock_basic"
     code = Column(String(10), primary_key=True)
     code_name = Column(String(100))
-    ipoDate = Column(String(10))
-    outDate = Column(String(10))
+    ipoDate = Column(Date)
+    outDate = Column(Date)
     type = Column(String(10))
     status = Column(String(10))
     updated_on = Column(DateTime, default=datetime.now, onupdate=datetime.now)

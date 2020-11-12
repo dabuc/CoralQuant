@@ -1,3 +1,4 @@
+from coralquant.util.dataconvert import convert_to_date
 from coralquant.models.odl_model import BS_Stock_Basic
 from datetime import datetime
 import baostock as bs
@@ -31,6 +32,11 @@ def get_stock_basic():
         data_list.append(rs.get_row_data())
     result = pd.DataFrame(data_list, columns=rs.fields)
     result['updated_on']=datetime.now()
+
+    result['ipoDate'] = [convert_to_date(x, '%Y-%m-%d') for x in result.ipoDate]
+    result['outDate'] = [convert_to_date(x, '%Y-%m-%d') for x in result.outDate]
+
+
     # 输出结果集
     result.to_sql('odl_bs_stock_basic',
                 engine,

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """股票列表"""
+from coralquant.util.dataconvert import convert_to_date
 from coralquant.models.odl_model import TS_Stock_Basic
 from coralquant.database import engine
 from coralquant.settings import CQ_Config
@@ -7,16 +8,17 @@ import tushare as ts
 import pandas as pd
 from coralquant.database import del_table_data
 
+
+
 def convert_to_bscode(ts_code):
     """
     ts_code 转换成 bs_code
     """
-    b=ts_code.split('.')
-    bs_code = '{}.{}'.format(b[1].lower(),b[0])
+    b = ts_code.split('.')
+    bs_code = '{}.{}'.format(b[1].lower(), b[0])
     return bs_code
-
-
     
+
 
 def get_stock_basic():
     """
@@ -25,7 +27,6 @@ def get_stock_basic():
 
     #清空原有数据
     del_table_data(TS_Stock_Basic)
-
 
     pro = ts.pro_api(CQ_Config.TUSHARE_TOKEN)
     #查询当前所有正常上市交易的股票列表
@@ -38,13 +39,12 @@ def get_stock_basic():
 
     result = pd.concat([rs_L, rs_D, rs_P])
 
-    result['bs_code']=[convert_to_bscode(x) for x in result.ts_code]
+    result['list_date'] = [convert_to_date(x, '%Y%m%d') for x in result.list_date]
+    result['delist_date'] = [convert_to_date(x, '%Y%m%d') for x in result.delist_date]
 
-    result.to_sql('odl_ts_stock_basic',
-                engine,
-                schema='stock_dw',
-                if_exists='append',
-                index=False)
+    result['bs_code'] = [convert_to_bscode(x) for x in result.ts_code]
+
+    result.to_sql('odl_ts_stock_basic', engine, schema='stock_dw', if_exists='append', index=False)
 
 
 if __name__ == "__main__":
