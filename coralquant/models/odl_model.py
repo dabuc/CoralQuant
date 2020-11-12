@@ -57,177 +57,141 @@ def default_t_date(context):
     return t_date
 
 
-class D_History_A_Stock_K_Data(Base):
+#-------A股K线数据表基类----------
+
+class D_History_A_Stock_K_Data_Base():
+    """
+    日线历史行情数据
+    """
+    id = Column('id', BigInteger, primary_key=True)
+    date = Column('date', String(10))
+    code = Column('code', String(10))
+    open = Column('open', String(15))
+    high = Column('high', String(15))
+    low = Column('low', String(15))
+    close = Column('close', String(15))
+    preclose = Column('preclose', String(15))
+    volume = Column('volume', String(20))
+    amount = Column('amount', String(23))
+    adjustflag = Column('adjustflag', String(1))
+    turn = Column('turn', String(15))
+    tradestatus = Column('tradestatus', String(1))
+    pctChg = Column('pctChg', String(15))
+    peTTM = Column('peTTM', String(20))
+    pbMRQ = Column('pbMRQ', String(20))
+    psTTM = Column('psTTM', String(20))
+    pcfNcfTTM = Column('pcfNcfTTM', String(20))
+    isST = Column('isST', String(1))
+    t_date = Column('t_date', Date, default=default_t_date)
+
+
+class W_History_A_Stock_K_Data_Base():
+    """
+    周线历史行情数据
+    """
+    id = Column('id', BigInteger, primary_key=True)
+    date = Column('date', String(10))
+    code = Column('code', String(10))
+    open = Column('open', String(15))
+    high = Column('high', String(15))
+    low = Column('low', String(15))
+    close = Column('close', String(15))
+    volume = Column('volume', String(20))
+    amount = Column('amount', String(23))
+    adjustflag = Column('adjustflag', String(1))
+    turn = Column('turn', String(15))
+    pctChg = Column('pctChg', String(15))
+    t_date = Column('t_date', Date, default=default_t_date)
+
+
+class M_History_A_Stock_K_Data_Base():
+    """
+    月线历史行情数据
+    """
+    id = Column('id', BigInteger, primary_key=True)
+    date = Column('date', String(10))
+    code = Column('code', String(10))
+    open = Column('open', String(15))
+    high = Column('high', String(15))
+    low = Column('low', String(15))
+    close = Column('close', String(15))
+    volume = Column('volume', String(20))
+    amount = Column('amount', String(23))
+    adjustflag = Column('adjustflag', String(1))
+    turn = Column('turn', String(15))
+    pctChg = Column('pctChg', String(15))
+    t_date = Column('t_date', Date, default=default_t_date)
+
+
+class T5_History_A_Stock_K_Data_Base():
+    """
+    5分钟线历史行情数据
+    """
+    id = Column('id', BigInteger, primary_key=True)
+    date = Column('date', String(10))
+    time = Column('time', String(10))
+    code = Column('code', String(10))
+    open = Column('open', String(15))
+    high = Column('high', String(15))
+    low = Column('low', String(15))
+    close = Column('close', String(15))
+    volume = Column('volume', String(20))
+    amount = Column('amount', String(23))
+    adjustflag = Column('adjustflag', String(1))
+
+#-------不复权-A股K线数据----------
+
+class D_History_A_Stock_K_Data(D_History_A_Stock_K_Data_Base,Base):
     """
     日线历史行情数据
     """
     __tablename__ = "odl_d_history_A_stock_k_data"
-    id = Column('id', BigInteger, primary_key=True)
-    date = Column('date', String(10))
-    code = Column('code', String(10))
-    open = Column('open', String(15))
-    high = Column('high', String(15))
-    low = Column('low', String(15))
-    close = Column('close', String(15))
-    preclose = Column('preclose', String(15))
-    volume = Column('volume', String(20))
-    amount = Column('amount', String(23))
-    adjustflag = Column('adjustflag', String(1))
-    turn = Column('turn', String(15))
-    tradestatus = Column('tradestatus', String(1))
-    pctChg = Column('pctChg', String(15))
-    peTTM = Column('peTTM', String(20))
-    pbMRQ = Column('pbMRQ', String(20))
-    psTTM = Column('psTTM', String(20))
-    pcfNcfTTM = Column('pcfNcfTTM', String(20))
-    isST = Column('isST', String(1))
-    t_date = Column('t_date', Date, default=default_t_date)
 
-
-class W_History_A_Stock_K_Data(Base):
+class W_History_A_Stock_K_Data(W_History_A_Stock_K_Data_Base,Base):
     """
     周线历史行情数据
     """
     __tablename__ = "odl_w_history_A_stock_k_data"
-    id = Column('id', BigInteger, primary_key=True)
-    date = Column('date', String(10))
-    code = Column('code', String(10))
-    open = Column('open', String(15))
-    high = Column('high', String(15))
-    low = Column('low', String(15))
-    close = Column('close', String(15))
-    volume = Column('volume', String(20))
-    amount = Column('amount', String(23))
-    adjustflag = Column('adjustflag', String(1))
-    turn = Column('turn', String(15))
-    pctChg = Column('pctChg', String(15))
-    t_date = Column('t_date', Date, default=default_t_date)
 
-
-class M_History_A_Stock_K_Data(Base):
+class M_History_A_Stock_K_Data(M_History_A_Stock_K_Data_Base,Base):
     """
     月线历史行情数据
     """
     __tablename__ = "odl_m_history_A_stock_k_data"
-    id = Column('id', BigInteger, primary_key=True)
-    date = Column('date', String(10))
-    code = Column('code', String(10))
-    open = Column('open', String(15))
-    high = Column('high', String(15))
-    low = Column('low', String(15))
-    close = Column('close', String(15))
-    volume = Column('volume', String(20))
-    amount = Column('amount', String(23))
-    adjustflag = Column('adjustflag', String(1))
-    turn = Column('turn', String(15))
-    pctChg = Column('pctChg', String(15))
-    t_date = Column('t_date', Date, default=default_t_date)
 
-
-class T5_History_A_Stock_K_Data(Base):
+class T5_History_A_Stock_K_Data(T5_History_A_Stock_K_Data_Base,Base):
     """
     5分钟线历史行情数据
     """
     __tablename__ = "odl_t5_history_A_Stock_K_Data"
-    id = Column('id', BigInteger, primary_key=True)
-    date = Column('date', String(10))
-    time = Column('time', String(10))
-    code = Column('code', String(10))
-    open = Column('open', String(15))
-    high = Column('high', String(15))
-    low = Column('low', String(15))
-    close = Column('close', String(15))
-    volume = Column('volume', String(20))
-    amount = Column('amount', String(23))
-    adjustflag = Column('adjustflag', String(1))
 
 
 #-------前复权-A股K线数据----------
 
-class D2_History_A_Stock_K_Data(Base):
+class D2_History_A_Stock_K_Data(D_History_A_Stock_K_Data_Base,Base):
     """
     前复权-日线历史行情数据
     """
     __tablename__ = "odl_d2_history_A_stock_k_data"
-    id = Column('id', BigInteger, primary_key=True)
-    date = Column('date', String(10))
-    code = Column('code', String(10))
-    open = Column('open', String(15))
-    high = Column('high', String(15))
-    low = Column('low', String(15))
-    close = Column('close', String(15))
-    preclose = Column('preclose', String(15))
-    volume = Column('volume', String(20))
-    amount = Column('amount', String(23))
-    adjustflag = Column('adjustflag', String(1))
-    turn = Column('turn', String(15))
-    tradestatus = Column('tradestatus', String(1))
-    pctChg = Column('pctChg', String(15))
-    peTTM = Column('peTTM', String(20))
-    pbMRQ = Column('pbMRQ', String(20))
-    psTTM = Column('psTTM', String(20))
-    pcfNcfTTM = Column('pcfNcfTTM', String(20))
-    isST = Column('isST', String(1))
-    t_date = Column('t_date', Date, default=default_t_date)
 
 
-class W2_History_A_Stock_K_Data(Base):
+class W2_History_A_Stock_K_Data(W_History_A_Stock_K_Data_Base,Base):
     """
     前复权-周线历史行情数据
     """
     __tablename__ = "odl_w2_history_A_stock_k_data"
-    id = Column('id', BigInteger, primary_key=True)
-    date = Column('date', String(10))
-    code = Column('code', String(10))
-    open = Column('open', String(15))
-    high = Column('high', String(15))
-    low = Column('low', String(15))
-    close = Column('close', String(15))
-    volume = Column('volume', String(20))
-    amount = Column('amount', String(23))
-    adjustflag = Column('adjustflag', String(1))
-    turn = Column('turn', String(15))
-    pctChg = Column('pctChg', String(15))
-    t_date = Column('t_date', Date, default=default_t_date)
 
-
-class M2_History_A_Stock_K_Data(Base):
+class M2_History_A_Stock_K_Data(M_History_A_Stock_K_Data_Base,Base):
     """
     前复权-月线历史行情数据
     """
     __tablename__ = "odl_m2_history_A_stock_k_data"
-    id = Column('id', BigInteger, primary_key=True)
-    date = Column('date', String(10))
-    code = Column('code', String(10))
-    open = Column('open', String(15))
-    high = Column('high', String(15))
-    low = Column('low', String(15))
-    close = Column('close', String(15))
-    volume = Column('volume', String(20))
-    amount = Column('amount', String(23))
-    adjustflag = Column('adjustflag', String(1))
-    turn = Column('turn', String(15))
-    pctChg = Column('pctChg', String(15))
-    t_date = Column('t_date', Date, default=default_t_date)
 
-
-class T52_History_A_Stock_K_Data(Base):
+class T52_History_A_Stock_K_Data(T5_History_A_Stock_K_Data_Base,Base):
     """
    前复权-5分钟线历史行情数据
     """
     __tablename__ = "odl_t52_history_A_Stock_K_Data"
-    id = Column('id', BigInteger, primary_key=True)
-    date = Column('date', String(10))
-    time = Column('time', String(10))
-    code = Column('code', String(10))
-    open = Column('open', String(15))
-    high = Column('high', String(15))
-    low = Column('low', String(15))
-    close = Column('close', String(15))
-    volume = Column('volume', String(20))
-    amount = Column('amount', String(23))
-    adjustflag = Column('adjustflag', String(1))
-
 
 
 #-------财务数据----------
