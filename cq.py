@@ -69,14 +69,22 @@ def init_history_k_data(ctx, f, a, m):
 
 @cli.command()
 @click.option('-f', type=click.Choice(['d', 'w', 'm', '5']), prompt=True, help='d：日线数据，w：周线数据，m：月线数据')
-def update_history_k_data(f):
+@click.option('-a', type=click.Choice(['1', '2', '3']), default='3', help='1：后复权；2：前复权; 3：不复权；默认不复权')
+@click.option('-m', type=click.Choice(['主板', '中小板', '创业板', 'NULL', '']), default='', help='选择市场板块')
+def update_history_k_data(f, a, m):
     """创建新的任务列表，更新历史k线数据
     """
-    taskEnum = TaskEnum(f)
+
+    if a != '3':
+        taskenum_key = '{}-{}'.format(f, a)
+    else:
+        taskenum_key = f
+
+    taskEnum = TaskEnum(taskenum_key)
     click.confirm("准备更新-{}，是否继续？".format(taskEnum.name), abort=True)
     #更新任务
-    update_task_table(taskEnum)
-    init_history_k_data_plus(f)
+    update_task_table(taskEnum,m)
+    init_history_k_data_plus(f,a)
     click.echo("{}-线数据更新完成。".format(taskEnum.name))
 
 
@@ -187,7 +195,7 @@ def main():
     #update_ts_stock_basic()
     #import_dwm_data(['-f','d'])
     #init_history_k_data(['-f','d','-a','2','-m','创业板'])
-    #update_history_k_data(['-f','d'])
+    #update_history_k_data(['-f','d','-a','2','-m','创业板'])
     #create_task(['-n','d', '-bd','1990-12-19', '-t', '1', '-d','1'])
 
 

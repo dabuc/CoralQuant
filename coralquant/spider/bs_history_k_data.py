@@ -60,16 +60,15 @@ def _query_history_k_data_plus(fields: str, frequency: str, adjustflag: str) -> 
     """
     获取历史A股K线数据
     """
+    
+    table_name_key = get_table_name_key(adjustflag, frequency)
 
     try:
-        taskEnum = TaskEnum(frequency)
+        taskEnum = TaskEnum(table_name_key)
     except Exception as e:
         _logger.error('获取历史A股K线数据/任务不存在，不能获取历史A股K线数据！')
         return
-
     #删除历史数据
-    table_name_key = get_table_name_key(adjustflag, frequency)
-
     del_table_data(frequency_odl_table_obj[table_name_key])
 
     #### 登陆系统 ####

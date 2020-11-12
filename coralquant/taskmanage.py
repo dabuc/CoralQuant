@@ -15,7 +15,9 @@ _logger = logger.Logger(__name__).get_log()
 meta = MetaData()
 
 
-def update_task_table(task: TaskEnum):
+
+
+def update_task_table(task: TaskEnum, market: str = None):
     """
     更新任务表
         1.获取最新bs-A股股票列表
@@ -27,8 +29,9 @@ def update_task_table(task: TaskEnum):
     begin_date = datetime.strptime('1990-12-19', "%Y-%m-%d").date()
     end_date = datetime.now().date()
 
-    create_task(task, begin_date, end_date, type='1', isdel=True)  #股票
-    create_task(task, begin_date, end_date, type='2')  #指数
+    create_task(task, begin_date, end_date, type='1', market=market, isdel=True)  #股票
+    if not market:
+        create_task(task, begin_date, end_date, type='2')  #指数
 
     tbl = frequency_bdl_table_obj[task.value]
     with session_scope() as sn:
@@ -72,8 +75,6 @@ def create_task(task: TaskEnum,
 
     #     codes = engine.execute(s).fetchall()
 
-
-    
     with session_scope() as sm:
         if not codes:
             query = sm.query(BS_Stock_Basic.code)
@@ -84,7 +85,7 @@ def create_task(task: TaskEnum,
             if status:
                 query = query.filter(BS_Stock_Basic.status == status)
             if type:
-                query = query.filter(BS_Stock_Basic.type == type)       
+                query = query.filter(BS_Stock_Basic.type == type)
             codes = query.all()
 
         if isdel:
@@ -93,7 +94,7 @@ def create_task(task: TaskEnum,
             query.delete()
             sm.commit()
             _logger.info('任务：{}-历史任务已删除'.format(task.name))
-        
+
         tasklist = []
         for c in codes:
             tasktable = TaskTable(task=task.value,
@@ -103,7 +104,7 @@ def create_task(task: TaskEnum,
                                   end_date=end_date)
             tasklist.append(tasktable)
         sm.bulk_save_objects(tasklist)
-        
+
     _logger.info('生成{}条任务记录'.format(len(codes)))
 
 
