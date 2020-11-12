@@ -16,9 +16,11 @@ def create_cal_date():
     df_SZSE = pro.trade_cal(exchange='SZSE')
     result = pd.concat([df_SSE, df_SZSE])
 
+    result['date'] = [datetime.strptime(x, '%Y%m%d').date() for x in result.cal_date]
+
     result['cal_date'] = [int(x) for x in result.cal_date]
 
-    result['date'] = [datetime.strptime(x, '%Y%m%d').date() for x in result.cal_date]
+
 
     dtype = {'exchange': String(4), 'cal_date': Integer(), 'is_open': Boolean(), 'date': Date}
 
