@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """命令工具"""
+from coralquant.etl.bdl_daily_tech import update_daily_tech_data
 from datetime import datetime
 
 import click
@@ -189,9 +190,20 @@ def ETL_Profit_Data():
 
     click.echo("到入季频盈利能力数据完成")
 
+@cli.command()
+def update_daily_tech():
+    """
+    更新日线技术指标数据
+    """
+    click.confirm("正在更新日线技术指标数据，是否继续？", abort=True)
+    update_daily_tech_data(taskEnum=TaskEnum.日线历史A股K线数据)
+
+    click.echo("更新日线技术指标数据完成")
+
 
 def main():
     cli()
+    #update_daily_tech()
     #update_ts_stock_basic()
     #import_dwm_data(['-f','d'])
     #init_history_k_data(['-f','d','-a','2','-m','创业板'])

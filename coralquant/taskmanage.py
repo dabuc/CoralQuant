@@ -55,36 +55,36 @@ def create_task(task: TaskEnum,
                 status: str = None,
                 market: str = None,
                 isdel=False):
-    """
-    创建任务
+    """创建任务
 
-    type：证券类型，其中1：股票，2：指数,3：其它
-
-    status：上市状态，其中1：上市，0：退市
-    """
-
-    # if not codes:
-    #     tmp = Table('odl_bs_stock_basic', meta, autoload=True, autoload_with=engine)
-    #     s = select([tmp.c.code, tmp.c.ipoDate])
-    #     if status:
-    #         s = s.where(tmp.c.status == status)
-    #     if type:
-    #         s = s.where(tmp.c.type == type)
-
-    #     #print(str(s))
-
-    #     codes = engine.execute(s).fetchall()
-
+    :param task: 任务类型
+    :type task: TaskEnum
+    :param begin_date: 如果开始时间(begin_date)为None，开始时间取股票上市(IPO)时间
+    :type begin_date: date
+    :param end_date: 结束时间
+    :type end_date: date
+    :param codes: 股票代码列表, defaults to []
+    :type codes: list, optional
+    :param type: 证券类型，其中1：股票，2：指数,3：其它, defaults to None
+    :type type: str, optional
+    :param status: 上市状态，其中1：上市，0：退市, defaults to None
+    :type status: str, optional
+    :param market: 市场类型 （主板/中小板/创业板/科创板/CDR）, defaults to None
+    :type market: str, optional
+    :param isdel: 是否删除删除原有的相同任务的历史任务列表, defaults to False
+    :type isdel: bool, optional
+    """                
+    
     with session_scope() as sm:
         if not codes:
-            query = sm.query(BS_Stock_Basic.code)
+            query = sm.query(BS_Stock_Basic.code,BS_Stock_Basic.ipoDate)
             if market:
                 query = query.join(
                     TS_Stock_Basic,
                     BS_Stock_Basic.code == TS_Stock_Basic.bs_code).filter(TS_Stock_Basic.market == market)
             if status:
                 query = query.filter(BS_Stock_Basic.status == status)
-            if type:
+            if type:    
                 query = query.filter(BS_Stock_Basic.type == type)
             codes = query.all()
 
@@ -100,12 +100,14 @@ def create_task(task: TaskEnum,
             tasktable = TaskTable(task=task.value,
                                   task_name=task.name,
                                   ts_code=c.code,
-                                  begin_date=begin_date,
+                                  begin_date=begin_date if begin_date is not None else c.ipoDate,
                                   end_date=end_date)
             tasklist.append(tasktable)
         sm.bulk_save_objects(tasklist)
 
     _logger.info('生成{}条任务记录'.format(len(codes)))
+
+
 
 
 if __name__ == "__main__":
