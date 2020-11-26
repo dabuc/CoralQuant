@@ -118,6 +118,14 @@ class MonthlyKData2(MonthlyKDataBase, Base):
     __tablename__ = "bdl_bs_monthly_2k_data"
 
 
+#---------后复权--------------
+class DailyKData1(DailyKDataBase, Base):
+    """
+    日线数据
+    """
+    __tablename__ = "bdl_bs_daily_1k_data"
+
+
 #------财务数据----------------
 
 

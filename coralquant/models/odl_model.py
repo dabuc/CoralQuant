@@ -73,7 +73,7 @@ class D_History_A_Stock_K_Data_Base():
     preclose = Column('preclose', String(15))
     volume = Column('volume', String(20))
     amount = Column('amount', String(23))
-    adjustflag = Column('adjustflag', String(1))
+    adjustflag = Column('adjustflag', String(1))#复权状态(1：后复权， 2：前复权，3：不复权）
     turn = Column('turn', String(15))
     tradestatus = Column('tradestatus', String(1))
     pctChg = Column('pctChg', String(15))
@@ -192,6 +192,13 @@ class T52_History_A_Stock_K_Data(T5_History_A_Stock_K_Data_Base,Base):
    前复权-5分钟线历史行情数据
     """
     __tablename__ = "odl_t52_history_A_Stock_K_Data"
+
+#------后复权------------
+class D1_History_A_Stock_K_Data(D_History_A_Stock_K_Data_Base,Base):
+    """
+    后复权-日线历史行情数据
+    """
+    __tablename__ = "odl_d1_history_A_stock_k_data"
 
 
 #-------财务数据----------

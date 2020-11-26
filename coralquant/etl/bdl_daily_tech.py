@@ -69,6 +69,7 @@ def update_daily_tech_data(taskEnum:TaskEnum):
                 df['vol20'] = ta.SMA(df['volume'], timeperiod=20)
                 df['vol60'] = ta.SMA(df['volume'], timeperiod=60)
 
+
                 df['am']=(df['high']-df['low'])/df['preclose']
                 df['am5']=ta.SMA(df['am'], timeperiod=5)
                 df['am10']=ta.SMA(df['am'], timeperiod=10)

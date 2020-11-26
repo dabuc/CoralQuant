@@ -47,15 +47,14 @@ def init_history_k_data(ctx, f, a, m):
     """创建新的任务列表，初始化历史k线数据
     """
     click.confirm("正在初始化 {}-{} 历史k线数据，是否继续？".format(f, a), abort=True)
-    #创建任务
-    if f == 'd':
-        taskvalue = TaskEnum.日线历史A股K线数据.value
-    elif f == 'w':
-        taskvalue = TaskEnum.周线历史A股K线数据.value
-    elif f == 'm':
-        taskvalue = TaskEnum.月线历史A股K线数据.value
+
+    if a != '3':
+        taskenum_key = '{}-{}'.format(f, a)
     else:
-        taskvalue = TaskEnum.T5分钟线历史A股K线数据.value
+        taskenum_key = f
+
+    taskEnum = TaskEnum(taskenum_key)
+    taskvalue = taskEnum.value
 
     if m == '':
         ctx.invoke(create_task, n=taskvalue, bd='1990-12-19', t=1, d=1)
