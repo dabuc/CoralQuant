@@ -8,15 +8,15 @@ from coralquant.settings import CQ_Config
 
 engine = create_engine(CQ_Config.DATABASE_URL)
 
-Session = sessionmaker(bind=engine)
+session_factory = sessionmaker(bind=engine)
 Base = declarative_base()
-session=Session()
+session=session_factory()
 
 def get_new_session():
     """
     获取新Session
     """
-    session=Session()
+    session=session_factory()
     return session
 
 @contextmanager
@@ -34,7 +34,7 @@ def session_maker(session=session):
 @contextmanager
 def session_scope():
     """Provide a transactional scope around a series of operations."""
-    session = Session()
+    session = session_factory()
     try:
         yield session
         session.commit()
