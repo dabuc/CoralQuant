@@ -4,3 +4,5 @@ tushare==1.2.61
 baostock==0.8.8
 python-dotenv==0.14.0
 PyMySQL==0.10.1
+TA-Lib==0.4.19
+tqdm==4.51.0
