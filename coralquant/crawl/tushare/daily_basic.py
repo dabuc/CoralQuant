@@ -40,13 +40,15 @@ def _parse_data(content, ts_code, isFirst):
         _logger.error('{}-每日指标更新出错/{}'.format(ts_code, repr(e)))
 
 
-def update_daily_basic(taskEnum: TaskEnum):
+def update_daily_basic():
     """
     更新每日指标
     """
     pro_api = ts.pro_api(CQ_Config.TUSHARE_TOKEN)
     fields = 'ts_code,trade_date,close,turnover_rate,turnover_rate_f,volume_ratio,pe,pe_ttm,pb,ps,ps_ttm,dv_ratio,dv_ttm,total_share,float_share,free_share,total_mv,circ_mv'
     isFirst = True
+    taskEnum=TaskEnum.TS更新每日指标
+
     with concurrent.futures.ThreadPoolExecutor() as executor:
         with session_scope() as sm:
             rp = sm.query(TaskTable).filter(TaskTable.task == taskEnum.value, TaskTable.finished == False)
