@@ -25,6 +25,7 @@ class DailyKDataBase():
     amount = Column('amount', Numeric(23, 4), nullable=False)  #成交金额
     adjustflag = Column('adjustflag', Enum('1', '2', '3'), nullable=False)  #复权状态
     turn = Column('turn', Float, nullable=False)  #换手率
+    float_share= Column('float_share', Numeric(23, 6), nullable=False)  #流通股本 （万股）
     tradestatus = Column('tradestatus', Boolean, nullable=False)  #交易状态
     pctChg = Column('pctChg', Float, nullable=False)  #涨跌幅（百分比）
     peTTM = Column('peTTM', Float, nullable=False)  #滚动市盈率

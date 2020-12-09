@@ -9,7 +9,7 @@ from coralquant import taskmanage
 from coralquant.database import del_table_data
 from coralquant.etl import bdl_import_k_data, bdl_import_Profit_Data
 from coralquant.models.dim_model import DIM_Date
-from coralquant.spider import (bs_hs300_stocks, bs_profit_data, bs_stock_basic, bs_stock_industry, bs_zz500_stocks,
+from coralquant.spider import (bs_hs300_stocks, bs_profit_data, bs_stock_basic, bs_stock_industry, bs_sz50_stocks, bs_zz500_stocks,
                                ts_stock_basic, ts_trade_cal)
 from coralquant.spider.bs_history_k_data import init_history_k_data_plus
 from coralquant.stringhelper import TaskEnum
@@ -167,6 +167,14 @@ def get_zz500_stocks():
     bs_zz500_stocks.get_zz500_stocks()
     click.echo("获取中证500成分股完成")
 
+@cli.command()
+def get_sz50_stocks():
+    """
+    获取上证50成分股
+    """
+
+    bs_sz50_stocks.get_sz50_stocks()
+    click.echo("获取上证50成分股完成")
 
 @cli.command()
 def get_profit_data():

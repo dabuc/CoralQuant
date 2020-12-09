@@ -1,11 +1,12 @@
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+import numpy as np
 
 import pandas as pd
 import talib as ta
 from coralquant.database import engine, session_scope
 from coralquant.models import bdl_model
-from coralquant.models.bdl_model import DailyKData2, DailyKTech
+from coralquant.models.bdl_model import DailyKData1, DailyKData2, DailyKTech
 from coralquant.models.orm_model import TaskTable
 from coralquant.stringhelper import TaskEnum
 from coralquant.taskmanage import create_task
@@ -39,7 +40,7 @@ def update_daily_tech_data(taskEnum:TaskEnum):
                 if task.finished:
                     continue
 
-                table = bdl_model.Base.metadata.tables.get(DailyKData2.__tablename__)
+                table = bdl_model.Base.metadata.tables.get(DailyKData1.__tablename__)
                 cols = [
                     table.c.id, table.c.date, table.c.code, table.c.open, table.c.high, table.c.low, table.c.close, table.c.preclose,
                     table.c.volume, table.c.amount, table.c.turn, table.c.pctChg
@@ -66,27 +67,23 @@ def update_daily_tech_data(taskEnum:TaskEnum):
 
                 df['vol5'] = ta.SMA(df['volume'], timeperiod=5)
                 df['vol10'] = ta.SMA(df['volume'], timeperiod=10)
-                df['vol20'] = ta.SMA(df['volume'], timeperiod=20)
-                df['vol60'] = ta.SMA(df['volume'], timeperiod=60)
 
+                vol5_shift=df['vol5'].shift()
+                df['volume_ratio'] =round(df['volume'] / vol5_shift,2)  #量比
 
-                df['am']=(df['high']-df['low'])/df['preclose']
+                df['am']=(df['high']-df['low'])/df['preclose'] #振幅
                 df['am5']=ta.SMA(df['am'], timeperiod=5)
                 df['am10']=ta.SMA(df['am'], timeperiod=10)
                 df['am20']=ta.SMA(df['am'], timeperiod=20)
                 df['am60']=ta.SMA(df['am'], timeperiod=60)
-                
-                df['wr3'] = ta.WILLR(df["high"],df["low"],df["close"], timeperiod=3)
+
                 df['wr5'] = ta.WILLR(df["high"],df["low"],df["close"], timeperiod=5)
-                df['wr10'] = ta.WILLR(df["high"],df["low"],df["close"], timeperiod=10)
-                df['wr20'] = ta.WILLR(df["high"],df["low"],df["close"], timeperiod=20)
                 df['wr60'] = ta.WILLR(df["high"],df["low"],df["close"], timeperiod=60)
                 df['wr120'] = ta.WILLR(df["high"],df["low"],df["close"], timeperiod=120)
-                df['wr250'] = ta.WILLR(df["high"],df["low"],df["close"], timeperiod=250)
-                df['wr888'] = ta.WILLR(df["high"],df["low"],df["close"], timeperiod=888)
-
                 
-                df.to_sql(DailyKTech.__tablename__, engine, schema='stock_dw', if_exists='append', index=False)
+                df = df.replace([np.inf, -np.inf], np.nan)
+                
+                df.to_sql(DailyKTech.__tablename__, engine, schema='stock_dw', if_exists='replace', index=False)
 
 
 

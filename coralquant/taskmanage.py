@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from coralquant.models.odl_model import BS_Stock_Basic, TS_Stock_Basic
+from coralquant.models.odl_model import BS_Stock_Basic, SZ50_Stocks, TS_Stock_Basic
 from coralquant.spider.bs_stock_basic import get_stock_basic
 from coralquant import logger
 from datetime import date, datetime, timedelta
@@ -82,6 +82,10 @@ def create_task(task: TaskEnum,
                 query = query.join(
                     TS_Stock_Basic,
                     BS_Stock_Basic.code == TS_Stock_Basic.bs_code).filter(TS_Stock_Basic.market == market)
+            if CQ_Config.IDB_DEBUG =='1':#如果是测试环境
+                query = query.join(
+                    SZ50_Stocks,
+                    BS_Stock_Basic.code == SZ50_Stocks.code)
             if status:
                 query = query.filter(BS_Stock_Basic.status == status)
             if type:    

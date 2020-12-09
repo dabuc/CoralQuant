@@ -71,6 +71,9 @@ def _insert_data(data: list, frequency,table_name_key, pagenum):
                     to_table.psTTM = dic['psTTM']
                     to_table.pcfNcfTTM = dic['pcfNcfTTM']
                     to_table.isST = dic['isST']
+
+                    to_table.float_share = 0 if dic['turn'] ==0 else dic['volume']/dic['turn']/100 
+
                 ins_data.append(to_table)
                 num += 1
                 dm = divmod(num, 1000)
