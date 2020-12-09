@@ -22,6 +22,8 @@ class TaskEnum(Enum):
 
     季频盈利能力 = 'profit'
 
+    TS更新每日指标 = 'daily_basic'
+
 
 frequency_odl_table_obj = {
     'd': D_History_A_Stock_K_Data,

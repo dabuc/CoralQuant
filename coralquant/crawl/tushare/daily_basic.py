@@ -1,6 +1,8 @@
 """每日指标
 """
 import concurrent.futures
+from coralquant.stringhelper import TaskEnum
+from coralquant.models.orm_model import TaskTable
 import time
 from tqdm import tqdm
 from coralquant.models.odl_model import TS_Stock_Basic
@@ -12,6 +14,7 @@ from coralquant import logger
 from sqlalchemy import String
 
 _logger = logger.Logger(__name__).get_log()
+
 
 
 def _parse_data(content, ts_code, isFirst):
@@ -37,7 +40,7 @@ def _parse_data(content, ts_code, isFirst):
         _logger.error('{}-每日指标更新出错/{}'.format(ts_code, repr(e)))
 
 
-def update_daily_basic():
+def update_daily_basic(taskEnum: TaskEnum):
     """
     更新每日指标
     """
@@ -46,11 +49,21 @@ def update_daily_basic():
     isFirst = True
     with concurrent.futures.ThreadPoolExecutor() as executor:
         with session_scope() as sm:
-            rp = sm.query(TS_Stock_Basic.ts_code,
-                          TS_Stock_Basic.list_date).filter(TS_Stock_Basic.list_status == 'L').all()
+            rp = sm.query(TaskTable).filter(TaskTable.task == taskEnum.value, TaskTable.finished == False)
+
+            if CQ_Config.IDB_DEBUG == '1':  #如果是测试环境
+                rp = rp.limit(10)
+
+            rp = rp.all()
+
             for task in tqdm(rp):
+                if task.finished:
+                    continue
+
                 result = pro_api.daily_basic(ts_code=task.ts_code, fields=fields)
                 executor.submit(_parse_data, result, task.ts_code, isFirst)
+                task.finished = True
+                time.sleep(0.3)
                 if isFirst:
                     isFirst = False
                     time.sleep(1)
