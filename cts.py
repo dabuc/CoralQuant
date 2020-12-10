@@ -22,7 +22,7 @@ def update_daily_basic(reset):
     """
 
     if reset:
-        taskmanage.create_ts_task(TaskEnum.TS更新每日指标)
+        taskmanage.create_ts_cal_task(TaskEnum.TS更新每日指标)
 
     daily_basic.update_daily_basic()
     click.echo("每日指标更新完成。")

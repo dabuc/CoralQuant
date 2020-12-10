@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from coralquant.models.odl_model import BS_Stock_Basic, SZ50_Stocks, TS_Stock_Basic
+from coralquant.models.odl_model import BS_Stock_Basic, SZ50_Stocks, TS_Stock_Basic, TS_TradeCal
 from coralquant.spider.bs_stock_basic import get_stock_basic
 from coralquant import logger
 from datetime import date, datetime, timedelta
@@ -135,6 +135,36 @@ def create_ts_task(task: TaskEnum):
             tasklist.append(tasktable)
         sm.bulk_save_objects(tasklist)
     _logger.info('生成{}条任务记录'.format(len(codes)))
+
+
+def create_ts_cal_task(task: TaskEnum):
+    """
+    创建基于交易日历的任务列表
+    """
+    #删除历史任务
+    TaskTable.del_with_task(task)
+
+    with session_scope() as sm:
+        codes = sm.query(TS_TradeCal).filter(TS_TradeCal.is_open == True).all()
+
+        tasklist = []
+        for c in codes:
+            tasktable = TaskTable(task=task.value,
+                                  task_name=task.name,
+                                  ts_code='按日期更新',
+                                  bs_code='按日期更新',
+                                  begin_date=c.date,
+                                  end_date=c.date)
+            tasklist.append(tasktable)
+        sm.bulk_save_objects(tasklist)
+    _logger.info('生成{}条任务记录'.format(len(codes)))
+
+
+
+
+
+
+    pass
 
 
 if __name__ == "__main__":

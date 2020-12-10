@@ -2,10 +2,12 @@
 """
 操作数据层数据模型，用于保存原始数据
 """
+from coralquant import logger
 from datetime import datetime
 from sqlalchemy import MetaData, Table, Column, Integer, BigInteger, Numeric, String, Enum, Float, Boolean, Date, DateTime
 from coralquant.database import Base, session_scope
 
+_logger = logger.Logger(__name__).get_log()
 
 class BS_Stock_Basic(Base):
     """
@@ -38,6 +40,7 @@ def default_t_date(context):
 
 #-------A股K线数据表基类----------
 
+
 class D_History_A_Stock_K_Data_Base():
     """
     日线历史行情数据
@@ -52,7 +55,7 @@ class D_History_A_Stock_K_Data_Base():
     preclose = Column('preclose', String(20))
     volume = Column('volume', String(20))
     amount = Column('amount', String(23))
-    adjustflag = Column('adjustflag', String(1))#复权状态(1：后复权， 2：前复权，3：不复权）
+    adjustflag = Column('adjustflag', String(1))  #复权状态(1：后复权， 2：前复权，3：不复权）
     turn = Column('turn', String(15))
     tradestatus = Column('tradestatus', String(1))
     pctChg = Column('pctChg', String(15))
@@ -118,21 +121,25 @@ class T5_History_A_Stock_K_Data_Base():
     amount = Column('amount', String(23))
     adjustflag = Column('adjustflag', String(1))
 
+
 #-------不复权-A股K线数据----------
 
-class D_History_A_Stock_K_Data(D_History_A_Stock_K_Data_Base,Base):
+
+class D_History_A_Stock_K_Data(D_History_A_Stock_K_Data_Base, Base):
     """
     日线历史行情数据
     """
     __tablename__ = "odl_d_history_A_stock_k_data"
 
-class W_History_A_Stock_K_Data(W_History_A_Stock_K_Data_Base,Base):
+
+class W_History_A_Stock_K_Data(W_History_A_Stock_K_Data_Base, Base):
     """
     周线历史行情数据
     """
     __tablename__ = "odl_w_history_A_stock_k_data"
 
-class M_History_A_Stock_K_Data(M_History_A_Stock_K_Data_Base,Base):
+
+class M_History_A_Stock_K_Data(M_History_A_Stock_K_Data_Base, Base):
     """
     月线历史行情数据
     """
@@ -141,7 +148,8 @@ class M_History_A_Stock_K_Data(M_History_A_Stock_K_Data_Base,Base):
 
 #-------前复权-A股K线数据----------
 
-class D2_History_A_Stock_K_Data(D_History_A_Stock_K_Data_Base,Base):
+
+class D2_History_A_Stock_K_Data(D_History_A_Stock_K_Data_Base, Base):
     """
     前复权-日线历史行情数据
     """
@@ -149,7 +157,7 @@ class D2_History_A_Stock_K_Data(D_History_A_Stock_K_Data_Base,Base):
 
 
 #------后复权------------
-class D1_History_A_Stock_K_Data(D_History_A_Stock_K_Data_Base,Base):
+class D1_History_A_Stock_K_Data(D_History_A_Stock_K_Data_Base, Base):
     """
     后复权-日线历史行情数据
     """
@@ -173,12 +181,10 @@ class SZ50_Stocks(Base):
         """
         with session_scope() as sn:
             sn.query(SZ50_Stocks).delete()
-    
-
-
 
 
 #-------财务数据----------
+
 
 class Profit_Data(Base):
     """
@@ -186,21 +192,21 @@ class Profit_Data(Base):
     """
     __tablename__ = "odl_bs_profit_data"
     id = Column('id', BigInteger, primary_key=True)
-    code = Column('code', String(10)) #证券代码	
-    pubDate= Column('pubDate', String(10)) #公司发布财报的日期
-    statDate= Column('statDate', String(10)) #财报统计的季度的最后一天, 比如2017-03-31, 2017-06-30	
-    roeAvg = Column('roeAvg', String(23)) #净资产收益率(平均)(%)
-    npMargin= Column('npMargin', String(23)) #销售净利率(%)
-    gpMargin= Column('gpMargin', String(23)) #销售毛利率(%)
-    netProfit= Column('netProfit', String(23)) #净利润(元)
-    epsTTM= Column('epsTTM', String(23)) #每股收益
-    MBRevenue= Column('MBRevenue', String(23)) #主营营业收入(元)
-    totalShare= Column('totalShare', String(23)) #总股本
-    liqaShare= Column('liqaShare', String(23)) #流通股本
-
+    code = Column('code', String(10))  #证券代码
+    pubDate = Column('pubDate', String(10))  #公司发布财报的日期
+    statDate = Column('statDate', String(10))  #财报统计的季度的最后一天, 比如2017-03-31, 2017-06-30
+    roeAvg = Column('roeAvg', String(23))  #净资产收益率(平均)(%)
+    npMargin = Column('npMargin', String(23))  #销售净利率(%)
+    gpMargin = Column('gpMargin', String(23))  #销售毛利率(%)
+    netProfit = Column('netProfit', String(23))  #净利润(元)
+    epsTTM = Column('epsTTM', String(23))  #每股收益
+    MBRevenue = Column('MBRevenue', String(23))  #主营营业收入(元)
+    totalShare = Column('totalShare', String(23))  #总股本
+    liqaShare = Column('liqaShare', String(23))  #流通股本
 
 
 # =========================Tushare数据源模型============================
+
 
 class TS_Stock_Basic(Base):
     """
@@ -223,12 +229,13 @@ class TS_Stock_Basic(Base):
     is_hs = Column("is_hs", String(1))  # 是否沪深港通标的，N否 H沪股通 S深股通
     bs_code = Column("bs_code", String(10), index=True)  # BS代码
 
+
 class TS_Daily_hfq(Base):
     """
     后复权日线行情数据
     """
 
-    __tablename__ = "ods_ts_Daily_hfq"
+    __tablename__ = "ods_ts_daily_hfq"
     id = Column("id", Integer, primary_key=True)
     ts_code = Column("ts_code", String(10), nullable=False)  # 股票代码
     trade_date = Column("trade_date", Date, nullable=False)  # 交易日期
@@ -242,6 +249,56 @@ class TS_Daily_hfq(Base):
     vol = Column("vol", Numeric(23, 4), nullable=False)  # 成交量 （手）
     amount = Column("amount", Numeric(23, 6), nullable=False)  # 成交额 （千元）
 
+
+class TS_Daily_Basic(Base):
+    """
+    每日指标
+    """
+    __tablename__ = "ods_ts_daily_basic"
+    id = Column("id", Integer, primary_key=True)
+    ts_code=Column("ts_code", String(10), nullable=False)#TS股票代码
+    trade_date=Column("trade_date", Date, nullable=False)#交易日期
+    close=Column("close", Numeric(18, 5))#当日收盘价 7,4
+    turnover_rate=Column("turnover_rate", Numeric(18, 5))#换手率（%） 8,4
+    turnover_rate_f=Column("turnover_rate_f", Numeric(18, 5))#换手率（自由流通股）9,4
+    volume_ratio=Column("volume_ratio", Numeric(18, 3))#量比 8,2
+    pe=Column("pe", Numeric(18, 5))#市盈率（总市值/净利润， 亏损的PE为空）10,4
+    pe_ttm=Column("pe_ttm", Numeric(18, 5))#市盈率（TTM，亏损的PE为空）12,4
+    pb=Column("pb", Numeric(18, 5))#市净率（总市值/净资产）10,4
+    ps=Column("ps", Numeric(18, 5))#市销率 11,4
+    ps_ttm=Column("ps_ttm", Numeric(18, 5))#市销率（TTM）15,4
+    dv_ratio=Column("dv_ratio", Numeric(18, 5)) #股息率 （%）7,4
+    dv_ttm=Column("dv_ttm", Numeric(18, 5)) #股息率（TTM）（%）7,4
+    total_share=Column("total_share", Numeric(18, 5)) #总股本 （万股）13,4
+    float_share=Column("float_share", Numeric(18, 5)) #流通股本 （万股）13,4
+    free_share=Column("free_share", Numeric(18, 5)) #自由流通股本 （万）12,4
+    total_mv=Column("total_mv", Numeric(18, 5)) #总市值 （万元）14,4
+    circ_mv=Column("circ_mv", Numeric(18, 5)) #流通市值（万元）14,4
+
+
+
+class TS_TradeCal(Base):
+    """
+    交易日历
+    """
+    __tablename__ = "ods_ts_trade_cal"
+    id = Column("id", Integer, primary_key=True)
+    exchange = Column("exchange", String(10), nullable=False) #交易所 SSE上交所 SZSE深交所
+    cal_date = Column("cal_date", Integer, nullable=False) #日历日期
+    date = Column("date", Date, nullable=False) #日历日期
+    is_open = Column('is_open', Boolean, nullable=False) #是否交易 0休市 1交易
+    pretrade_date = Column("pretrade_date", Date) #上一个交易日
+    
+
+    @staticmethod
+    def del_all():
+        """
+        清空表数据
+        """
+        with session_scope() as sm:
+            query = sm.query(TS_TradeCal).delete()
+            sm.commit()
+            _logger.info('交易日历表数据已清空')
 
 
 if __name__ == "__main__":
