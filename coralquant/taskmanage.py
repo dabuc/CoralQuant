@@ -8,7 +8,7 @@ from coralquant.database import engine, session_scope
 from coralquant.settings import CQ_Config
 from coralquant.models.orm_model import TaskTable
 from coralquant.stringhelper import TaskEnum, frequency_bdl_table_obj
-from sqlalchemy.sql import func
+from sqlalchemy import func, distinct
 
 _logger = logger.Logger(__name__).get_log()
 
@@ -131,7 +131,7 @@ def create_ts_task(task: TaskEnum):
                                   ts_code=c.ts_code,
                                   bs_code=c.bs_code,
                                   begin_date=c.list_date,
-                                  end_date=c.delist_date  if c.delist_date is not None else datetime.now().date())
+                                  end_date=c.delist_date if c.delist_date is not None else datetime.now().date())
             tasklist.append(tasktable)
         sm.bulk_save_objects(tasklist)
     _logger.info('生成{}条任务记录'.format(len(codes)))
@@ -145,7 +145,8 @@ def create_ts_cal_task(task: TaskEnum):
     TaskTable.del_with_task(task)
 
     with session_scope() as sm:
-        codes = sm.query(TS_TradeCal).filter(TS_TradeCal.is_open == True,TS_TradeCal.date<=datetime.now().date()).all()
+        codes = sm.query(distinct(TS_TradeCal.date).label('t_date')).filter(TS_TradeCal.is_open == True,
+                                                            TS_TradeCal.date <= datetime.now().date()).all()
 
         tasklist = []
         for c in codes:
@@ -153,16 +154,11 @@ def create_ts_cal_task(task: TaskEnum):
                                   task_name=task.name,
                                   ts_code='按日期更新',
                                   bs_code='按日期更新',
-                                  begin_date=c.date,
-                                  end_date=c.date)
+                                  begin_date=c.t_date,
+                                  end_date=c.t_date)
             tasklist.append(tasktable)
         sm.bulk_save_objects(tasklist)
     _logger.info('生成{}条任务记录'.format(len(codes)))
-
-
-
-
-
 
     pass
 
