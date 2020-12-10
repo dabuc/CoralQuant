@@ -213,8 +213,8 @@ class TS_Stock_Basic(Base):
     TS-证券基本资料
     """
     __tablename__ = "odl_ts_stock_basic"
-    ts_code = Column("ts_code", String(10))  # TS代码
-    symbol = Column("symbol", String(6), primary_key=True)  # 股票代码
+    ts_code = Column("ts_code", String(10), primary_key=True)  # TS代码
+    symbol = Column("symbol", String(6))  # 股票代码
     name = Column("name", String(10))  # 股票名称
     area = Column("area", String(4))  # 所在地域
     industry = Column("industry", String(4))  # 所属行业
