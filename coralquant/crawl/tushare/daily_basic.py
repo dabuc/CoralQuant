@@ -43,7 +43,6 @@ def update_daily_basic():
     """
     pro_api = ts.pro_api(CQ_Config.TUSHARE_TOKEN)
     fields = 'ts_code,trade_date,close,turnover_rate,turnover_rate_f,volume_ratio,pe,pe_ttm,pb,ps,ps_ttm,dv_ratio,dv_ttm,total_share,float_share,free_share,total_mv,circ_mv'
-    isFirst = True
     taskEnum = TaskEnum.TS更新每日指标
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -68,11 +67,8 @@ def update_daily_basic():
                         result = pro_api.daily_basic(trade_date=tasktime, fields=fields)
                         executor.submit(_parse_data, result, task.begin_date)
                         task.finished = True
-                        time.sleep(0.25)
-                        if isFirst:
-                            isFirst = False
-                            time.sleep(1)
-                            break
+                        time.sleep(0.2)
+                        break
                     except Exception as e:
                         if i < (max_try - 1):
                             t = (i + 1) * 2
