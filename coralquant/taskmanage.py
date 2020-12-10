@@ -145,7 +145,7 @@ def create_ts_cal_task(task: TaskEnum):
     TaskTable.del_with_task(task)
 
     with session_scope() as sm:
-        codes = sm.query(TS_TradeCal).filter(TS_TradeCal.is_open == True).all()
+        codes = sm.query(TS_TradeCal).filter(TS_TradeCal.is_open == True,TS_TradeCal.date<=datetime.now().date()).all()
 
         tasklist = []
         for c in codes:
