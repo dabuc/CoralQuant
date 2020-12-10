@@ -235,7 +235,7 @@ class TS_Daily_hfq(Base):
     后复权日线行情数据
     """
 
-    __tablename__ = "ods_ts_daily_hfq"
+    __tablename__ = "odl_ts_daily_hfq"
     id = Column("id", Integer, primary_key=True)
     ts_code = Column("ts_code", String(10), nullable=False)  # 股票代码
     trade_date = Column("trade_date", Date, nullable=False)  # 交易日期
@@ -254,7 +254,7 @@ class TS_Daily_Basic(Base):
     """
     每日指标
     """
-    __tablename__ = "ods_ts_daily_basic"
+    __tablename__ = "odl_ts_daily_basic"
     id = Column("id", Integer, primary_key=True)
     ts_code=Column("ts_code", String(10), nullable=False)#TS股票代码
     trade_date=Column("trade_date", Date, nullable=False)#交易日期
@@ -281,7 +281,7 @@ class TS_TradeCal(Base):
     """
     交易日历
     """
-    __tablename__ = "ods_ts_trade_cal"
+    __tablename__ = "odl_ts_trade_cal"
     id = Column("id", Integer, primary_key=True)
     exchange = Column("exchange", String(10), nullable=False) #交易所 SSE上交所 SZSE深交所
     cal_date = Column("cal_date", Integer, nullable=False) #日历日期
