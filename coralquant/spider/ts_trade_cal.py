@@ -27,4 +27,4 @@ def create_cal_date():
 
     dtype = {'exchange': String(4), 'cal_date': Integer(), 'is_open': Boolean(), 'date': Date}
 
-    result.to_sql('ods_ts_trade_cal', engine, schema='stock_dw', if_exists='append', index=False, dtype=dtype)
+    result.to_sql('odl_ts_trade_cal', engine, schema='stock_dw', if_exists='append', index=False, dtype=dtype)

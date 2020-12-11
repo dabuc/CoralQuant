@@ -9,6 +9,7 @@ from coralquant.database import Base, session_scope
 
 _logger = logger.Logger(__name__).get_log()
 
+
 class BS_Stock_Basic(Base):
     """
     BS-证券基本资料
@@ -230,12 +231,11 @@ class TS_Stock_Basic(Base):
     bs_code = Column("bs_code", String(10), index=True)  # BS代码
 
 
-class TS_Daily_hfq(Base):
+class TS_Daily_Base:
     """
-    后复权日线行情数据
+    日线行情数据
     """
 
-    __tablename__ = "odl_ts_daily_hfq"
     id = Column("id", Integer, primary_key=True)
     ts_code = Column("ts_code", String(10), nullable=False)  # 股票代码
     trade_date = Column("trade_date", Date, nullable=False)  # 交易日期
@@ -245,9 +245,23 @@ class TS_Daily_hfq(Base):
     close = Column("close", Numeric(12, 4), nullable=False)  # 收盘价
     pre_close = Column("pre_close", Numeric(12, 4), nullable=False)  # 昨收价
     change = Column("change", Numeric(12, 4), nullable=False)  # 涨跌额
-    pct_chg = Column("pct_chg", Float, nullable=False)  # 涨跌幅
+    pct_chg = Column("pct_chg", Numeric(12, 4), nullable=False)  # 涨跌幅
     vol = Column("vol", Numeric(23, 4), nullable=False)  # 成交量 （手）
-    amount = Column("amount", Numeric(23, 6), nullable=False)  # 成交额 （千元）
+    amount = Column("amount", Numeric(23, 4), nullable=False)  # 成交额 （千元）
+
+
+class TS_Daily(TS_Daily_Base, Base):
+    """
+    日线行情数据
+    """
+    __tablename__ = "odl_ts_daily"
+
+
+class TS_Daily_hfq(TS_Daily_Base, Base):
+    """
+    后复权日线行情数据
+    """
+    __tablename__ = "odl_ts_daily_hfq"
 
 
 class TS_Daily_Basic(Base):
@@ -256,25 +270,24 @@ class TS_Daily_Basic(Base):
     """
     __tablename__ = "odl_ts_daily_basic"
     id = Column("id", Integer, primary_key=True)
-    ts_code=Column("ts_code", String(10), nullable=False)#TS股票代码
-    trade_date=Column("trade_date", Date, nullable=False)#交易日期
-    close=Column("close", Numeric(18, 5))#当日收盘价 7,4
-    turnover_rate=Column("turnover_rate", Numeric(18, 5))#换手率（%） 8,4
-    turnover_rate_f=Column("turnover_rate_f", Numeric(18, 5))#换手率（自由流通股）9,4
-    volume_ratio=Column("volume_ratio", Numeric(18, 3))#量比 8,2
-    pe=Column("pe", Numeric(18, 5))#市盈率（总市值/净利润， 亏损的PE为空）10,4
-    pe_ttm=Column("pe_ttm", Numeric(18, 5))#市盈率（TTM，亏损的PE为空）12,4
-    pb=Column("pb", Numeric(18, 5))#市净率（总市值/净资产）10,4
-    ps=Column("ps", Numeric(18, 5))#市销率 11,4
-    ps_ttm=Column("ps_ttm", Numeric(18, 5))#市销率（TTM）15,4
-    dv_ratio=Column("dv_ratio", Numeric(18, 5)) #股息率 （%）7,4
-    dv_ttm=Column("dv_ttm", Numeric(18, 5)) #股息率（TTM）（%）7,4
-    total_share=Column("total_share", Numeric(18, 5)) #总股本 （万股）13,4
-    float_share=Column("float_share", Numeric(18, 5)) #流通股本 （万股）13,4
-    free_share=Column("free_share", Numeric(18, 5)) #自由流通股本 （万）12,4
-    total_mv=Column("total_mv", Numeric(18, 5)) #总市值 （万元）14,4
-    circ_mv=Column("circ_mv", Numeric(18, 5)) #流通市值（万元）14,4
-
+    ts_code = Column("ts_code", String(10), nullable=False)  #TS股票代码
+    trade_date = Column("trade_date", Date, nullable=False)  #交易日期
+    close = Column("close", Numeric(18, 5))  #当日收盘价 7,4
+    turnover_rate = Column("turnover_rate", Numeric(18, 5))  #换手率（%） 8,4
+    turnover_rate_f = Column("turnover_rate_f", Numeric(18, 5))  #换手率（自由流通股）9,4
+    volume_ratio = Column("volume_ratio", Numeric(18, 3))  #量比 8,2
+    pe = Column("pe", Numeric(18, 5))  #市盈率（总市值/净利润， 亏损的PE为空）10,4
+    pe_ttm = Column("pe_ttm", Numeric(18, 5))  #市盈率（TTM，亏损的PE为空）12,4
+    pb = Column("pb", Numeric(18, 5))  #市净率（总市值/净资产）10,4
+    ps = Column("ps", Numeric(18, 5))  #市销率 11,4
+    ps_ttm = Column("ps_ttm", Numeric(18, 5))  #市销率（TTM）15,4
+    dv_ratio = Column("dv_ratio", Numeric(18, 5))  #股息率 （%）7,4
+    dv_ttm = Column("dv_ttm", Numeric(18, 5))  #股息率（TTM）（%）7,4
+    total_share = Column("total_share", Numeric(18, 5))  #总股本 （万股）13,4
+    float_share = Column("float_share", Numeric(18, 5))  #流通股本 （万股）13,4
+    free_share = Column("free_share", Numeric(18, 5))  #自由流通股本 （万）12,4
+    total_mv = Column("total_mv", Numeric(18, 5))  #总市值 （万元）14,4
+    circ_mv = Column("circ_mv", Numeric(18, 5))  #流通市值（万元）14,4
 
 
 class TS_TradeCal(Base):
@@ -283,12 +296,11 @@ class TS_TradeCal(Base):
     """
     __tablename__ = "odl_ts_trade_cal"
     id = Column("id", Integer, primary_key=True)
-    exchange = Column("exchange", String(10), nullable=False) #交易所 SSE上交所 SZSE深交所
-    cal_date = Column("cal_date", Integer, nullable=False) #日历日期
-    date = Column("date", Date, nullable=False) #日历日期
-    is_open = Column('is_open', Boolean, nullable=False) #是否交易 0休市 1交易
-    pretrade_date = Column("pretrade_date", Date) #上一个交易日
-    
+    exchange = Column("exchange", String(10), nullable=False)  #交易所 SSE上交所 SZSE深交所
+    cal_date = Column("cal_date", Integer, nullable=False)  #日历日期
+    date = Column("date", Date, nullable=False)  #日历日期
+    is_open = Column('is_open', Boolean, nullable=False)  #是否交易 0休市 1交易
+    pretrade_date = Column("pretrade_date", Date)  #上一个交易日
 
     @staticmethod
     def del_all():

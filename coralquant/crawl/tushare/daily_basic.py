@@ -6,8 +6,8 @@ from coralquant.stringhelper import TaskEnum
 from coralquant.models.orm_model import TaskTable
 import time
 from tqdm import tqdm
-from coralquant.models.odl_model import TS_Daily_Basic, TS_Stock_Basic
-from coralquant.database import engine, session_scope, del_table_data
+from coralquant.models.odl_model import TS_Daily_Basic
+from coralquant.database import engine
 import tushare as ts
 from coralquant.settings import CQ_Config
 from dateutil.parser import parse
@@ -78,7 +78,7 @@ def update_daily_basic():
                         else:
                             _logger.error('获取[{}]每日指标失败/{}'.format(task.ts_code, repr(e)))
                             raise
-                sm.commit()
+            sm.commit()
         except:
             sm.commit()
             raise
