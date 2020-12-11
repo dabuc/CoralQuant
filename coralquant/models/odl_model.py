@@ -313,5 +313,16 @@ class TS_TradeCal(Base):
             _logger.info('交易日历表数据已清空')
 
 
+class TS_Adj_Factor(Base):
+    """
+    复权因子
+    """
+    __tablename__ = "odl_ts_adj_factor"
+    id = Column("id", Integer, primary_key=True)
+    ts_code = Column("ts_code", String(10), nullable=False)
+    trade_date = Column("trade_date", Date, nullable=False)
+    adj_factor = Column("adj_factor", Float, nullable=False)
+
+
 if __name__ == "__main__":
     pass

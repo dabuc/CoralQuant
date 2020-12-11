@@ -24,6 +24,7 @@ class TaskEnum(Enum):
 
     TS更新每日指标 = 'daily_basic'
     TS日线行情 = 'daily'
+    TS复权因子 = 'adj_factor'
 
 
 frequency_odl_table_obj = {
