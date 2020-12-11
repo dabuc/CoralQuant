@@ -41,7 +41,7 @@ def _load_data(dic:dict):
     """
     做一些简单转换后，加载数据到数据库
     """
-
+    
     content=dic['result']
     task_date=dic['task_date']
 
@@ -55,5 +55,6 @@ def _load_data(dic:dict):
         dtype = {'ts_code': String(10)}
 
         content.to_sql(table_name, engine, schema='stock_dw', if_exists='append', index=False, dtype=dtype)
+        
     except Exception as e:
         _logger.error('{}-日线行情保存出错/{}'.format(task_date, repr(e)))
