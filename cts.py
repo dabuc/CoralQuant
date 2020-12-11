@@ -21,6 +21,7 @@ def cli():
 def update_daily_basic(reset):
     """更新每日指标
     """
+    click.confirm("正在更新每日指标，是否继续？", abort=True)
 
     if reset:
         taskmanage.create_ts_cal_task(TaskEnum.TS更新每日指标)
@@ -33,6 +34,7 @@ def update_daily_basic(reset):
 def update_daily(reset):
     """更新日线行情
     """
+    click.confirm("正在更新日线行情，是否继续？", abort=True)
 
     if reset:
         daily.update_task()

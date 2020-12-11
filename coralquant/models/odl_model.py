@@ -243,11 +243,11 @@ class TS_Daily_Base:
     high = Column("high", Numeric(12, 4), nullable=False)  # 最高价
     low = Column("low", Numeric(12, 4), nullable=False)  # 最低价
     close = Column("close", Numeric(12, 4), nullable=False)  # 收盘价
-    pre_close = Column("pre_close", Numeric(12, 4), nullable=False)  # 昨收价
-    change = Column("change", Numeric(12, 4), nullable=False)  # 涨跌额
-    pct_chg = Column("pct_chg", Numeric(12, 4), nullable=False)  # 涨跌幅
-    vol = Column("vol", Numeric(23, 4), nullable=False)  # 成交量 （手）
-    amount = Column("amount", Numeric(23, 4), nullable=False)  # 成交额 （千元）
+    pre_close = Column("pre_close", Numeric(12, 4))  # 昨收价
+    change = Column("change", Numeric(12, 4))  # 涨跌额
+    pct_chg = Column("pct_chg", Numeric(12, 4))  # 涨跌幅
+    vol = Column("vol", Numeric(23, 4))  # 成交量 （手）
+    amount = Column("amount", Numeric(23, 4))  # 成交额 （千元）
 
 
 class TS_Daily(TS_Daily_Base, Base):
