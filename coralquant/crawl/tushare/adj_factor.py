@@ -28,7 +28,7 @@ def get_adj_factor():
     pro_api = ts.pro_api(CQ_Config.TUSHARE_TOKEN)
     pro_api_func = pro_api.adj_factor
     extract_data(
-        TaskEnum.TS日线行情,
+        TaskEnum.TS复权因子,
         pro_api_func,
         {},
         _load_data,
