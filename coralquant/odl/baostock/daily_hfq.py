@@ -24,6 +24,7 @@ def update_task(reset: bool = False):
     TaskTable.del_with_task(TaskEnum.BS日线历史A股K线后复权数据)
 
     with session_scope() as sm:
+        #通过BS证券基本资料和A股K线后复权数据的每个股票的最新交易时间，查出所有需要更新的股票及更新时间
         cte = sm.query(BS_Daily_hfq.code,
                        func.max(BS_Daily_hfq.date).label('mx_date')).group_by(BS_Daily_hfq.code).cte('cte')
         query = sm.query(BS_Stock_Basic.code, BS_Stock_Basic.ts_code, BS_Stock_Basic.ipoDate, BS_Stock_Basic.outDate,
