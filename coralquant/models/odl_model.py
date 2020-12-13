@@ -15,13 +15,13 @@ class BS_Stock_Basic(Base):
     BS-证券基本资料
     """
     __tablename__ = "odl_bs_stock_basic"
-    code = Column(String(10), primary_key=True)#证券代码
-    code_name = Column(String(100))#证券名称
-    ipoDate = Column(Date)#上市日期
-    outDate = Column(Date)#退市日期
-    type = Column(Enum('1', '2', '3'))#证券类型，其中1：股票，2：指数,3：其它
-    status = Column(Boolean) #上市状态，其中1：上市，0：退市
-    ts_code = Column(String(10))#ts_证券代码
+    code = Column(String(10), primary_key=True)  #证券代码
+    code_name = Column(String(100))  #证券名称
+    ipoDate = Column(Date)  #上市日期
+    outDate = Column(Date)  #退市日期
+    type = Column(Enum('1', '2', '3'))  #证券类型，其中1：股票，2：指数,3：其它
+    status = Column(Boolean)  #上市状态，其中1：上市，0：退市
+    ts_code = Column(String(10))  #ts_证券代码
     updated_on = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
     @staticmethod
@@ -48,24 +48,24 @@ class BS_Daily_Base():
     BS日线历史行情数据基类
     """
     id = Column('id', Integer, primary_key=True)
-    date = Column('date', Date)#交易所行情日期
-    code = Column('code', String(10))#BS证券代码 格式：sh.600000。sh：上海，sz：深圳
-    open = Column('open', Numeric(18, 4))#今开盘价格 精度：小数点后4位；单位：人民币元
-    high = Column('high', Numeric(18, 4))#最高价 精度：小数点后4位；单位：人民币元
-    low = Column('low', Numeric(18, 4))#最低价 精度：小数点后4位；单位：人民币元
-    close = Column('close', Numeric(18, 4))#今收盘价 精度：小数点后4位；单位：人民币元
-    preclose = Column('preclose', Numeric(18, 4))#昨日收盘价 精度：小数点后4位；单位：人民币元
-    volume = Column('volume', BigInteger)#成交数量 单位：股
-    amount = Column('amount', Numeric(23, 4))#成交金额	精度：小数点后4位；单位：人民币元
+    date = Column('date', Date, nullable=False)  #交易所行情日期
+    code = Column('code', String(10), nullable=False)  #BS证券代码 格式：sh.600000。sh：上海，sz：深圳
+    open = Column('open', Numeric(18, 4), nullable=False)  #今开盘价格 精度：小数点后4位；单位：人民币元
+    high = Column('high', Numeric(18, 4), nullable=False)  #最高价 精度：小数点后4位；单位：人民币元
+    low = Column('low', Numeric(18, 4), nullable=False)  #最低价 精度：小数点后4位；单位：人民币元
+    close = Column('close', Numeric(18, 4), nullable=False)  #今收盘价 精度：小数点后4位；单位：人民币元
+    preclose = Column('preclose', Numeric(18, 4))  #昨日收盘价 精度：小数点后4位；单位：人民币元
+    volume = Column('volume', BigInteger)  #成交数量 单位：股
+    amount = Column('amount', Numeric(23, 4))  #成交金额	精度：小数点后4位；单位：人民币元
     adjustflag = Column('adjustflag', Enum('1', '2', '3'))  #复权状态(1：后复权， 2：前复权，3：不复权）
-    turn = Column('turn', Numeric(18, 6))#换手率 精度：小数点后6位；单位：%
-    tradestatus = Column('tradestatus', Boolean)#交易状态	1：正常交易 0：停牌
-    pctChg = Column('pctChg', Numeric(18, 6))#涨跌幅（百分比）	精度：小数点后6位
-    peTTM = Column('peTTM', Numeric(18, 6))#滚动市盈率	精度：小数点后6位
-    psTTM = Column('psTTM', Numeric(18, 6))#滚动市销率	精度：小数点后6位
-    pcfNcfTTM = Column('pcfNcfTTM', Numeric(18, 6))#滚动市现率	精度：小数点后6位
-    pbMRQ = Column('pbMRQ', Numeric(18, 6))#市净率	精度：小数点后6位
-    isST = Column('isST', Boolean)#是否ST	1是，0否
+    turn = Column('turn', Numeric(18, 6))  #换手率 精度：小数点后6位；单位：%
+    tradestatus = Column('tradestatus', Boolean)  #交易状态	1：正常交易 0：停牌
+    pctChg = Column('pctChg', Numeric(18, 6))  #涨跌幅（百分比）	精度：小数点后6位
+    peTTM = Column('peTTM', Numeric(18, 6))  #滚动市盈率	精度：小数点后6位
+    psTTM = Column('psTTM', Numeric(18, 6))  #滚动市销率	精度：小数点后6位
+    pcfNcfTTM = Column('pcfNcfTTM', Numeric(18, 6))  #滚动市现率	精度：小数点后6位
+    pbMRQ = Column('pbMRQ', Numeric(18, 6))  #市净率	精度：小数点后6位
+    isST = Column('isST', Boolean)  #是否ST	1是，0否
 
 
 class BS_Weekly_Base():
@@ -163,8 +163,7 @@ class BS_Daily_hfq(BS_Daily_Base, Base):
     后复权-日线历史行情数据
     """
     __tablename__ = "odl_bs_daily_hfq"
-    __table_args__=(UniqueConstraint('code','date',name='UDX_CODE_DATE'),)
-
+    __table_args__ = (UniqueConstraint('code', 'date', name='UDX_CODE_DATE'), )
 
 
 class BS_SZ50_Stocks(Base):
