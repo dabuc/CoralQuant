@@ -62,4 +62,4 @@ def get_daily_hfq():
     按照任务表，获取BS日线后复权行情数据
     """
 
-    query_history_k_data_plus(TaskEnum.BS日线历史A股K线后复权数据,'d','1',_load_data,{})
+    query_history_k_data_plus(TaskEnum.BS日线历史A股K线后复权数据,'d','1',_load_data)

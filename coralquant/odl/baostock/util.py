@@ -6,6 +6,7 @@ import concurrent.futures
 from tqdm import tqdm
 import pandas as pd
 import time
+import copy
 
 _logger = logger.Logger(__name__).get_log()
 
@@ -36,7 +37,7 @@ def query_history_k_data_plus(
     frequency,
     adjustflag,
     load_data_func,
-    load_data_func_params: dict,
+    load_data_func_params: dict = None,
 ):
     """
     按照任务表获取历史A股K线数据
@@ -74,11 +75,16 @@ def query_history_k_data_plus(
                             data_list.append(rs.get_row_data())
                         #_logger.info('{}下载成功,数据{}条'.format(task.ts_code, len(data_list)))
                         result = pd.DataFrame(data_list, columns=rs.fields)
-                        load_data_func_params['result'] = result
-                        load_data_func_params['bs_code'] = task.bs_code
-                        load_data_func_params['frequency'] = frequency
-                        load_data_func_params['adjustflag'] = adjustflag
-                        executor.submit(load_data_func, load_data_func_params)
+
+                        if load_data_func_params:
+                            params=copy.deepcopy(load_data_func_params)
+                        else:
+                            params={}
+                        params['result'] = result
+                        params['bs_code'] = task.bs_code
+                        params['frequency'] = frequency
+                        params['adjustflag'] = adjustflag
+                        executor.submit(load_data_func, params)
                         task.finished = True
                         break
                     elif i < (max_try - 1):

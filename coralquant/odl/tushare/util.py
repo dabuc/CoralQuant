@@ -7,6 +7,7 @@ import concurrent.futures
 from coralquant.database import get_new_session
 from tqdm import tqdm
 import time
+import copy
 
 _logger = logger.Logger(__name__).get_log()
 
@@ -33,12 +34,21 @@ def extract_data(taskEnum: TaskEnum, pro_api_func, pro_api_func_pramas: dict, lo
                 for i in range(max_try):
                     try:
                         tasktime = datetime.strftime(task.begin_date, '%Y%m%d')
-                        pro_api_func_pramas['trade_date'] = tasktime
-                        result = pro_api_func(**pro_api_func_pramas)
+                        if pro_api_func_pramas:
+                            pramas=copy.deepcopy(pro_api_func_pramas)
+                        else:
+                            pramas={}
+                        pramas['trade_date'] = tasktime
+                        result = pro_api_func(**pramas)
 
-                        load_data_func_params['result'] = result
-                        load_data_func_params['task_date'] = task.begin_date
-                        executor.submit(load_data_func, load_data_func_params)
+                        if load_data_func_params:
+                            load_pramas=copy.deepcopy(load_data_func_params)
+                        else:
+                            load_pramas={}
+                            
+                        load_pramas['result'] = result
+                        load_pramas['task_date'] = task.begin_date
+                        executor.submit(load_data_func, load_pramas)
 
                         task.finished = True
                         time.sleep(0.2)
