@@ -4,7 +4,7 @@
 """
 from coralquant import logger
 from datetime import datetime
-from sqlalchemy import MetaData, Table, Column, Integer, BigInteger, Numeric, String, Enum, Float, Boolean, Date, DateTime
+from sqlalchemy import UniqueConstraint, Column, Integer, BigInteger, Numeric, String, Enum, Float, Boolean, Date, DateTime
 from coralquant.database import Base, session_scope
 
 _logger = logger.Logger(__name__).get_log()
@@ -15,12 +15,13 @@ class BS_Stock_Basic(Base):
     BS-证券基本资料
     """
     __tablename__ = "odl_bs_stock_basic"
-    code = Column(String(10), primary_key=True)
-    code_name = Column(String(100))
-    ipoDate = Column(Date)
-    outDate = Column(Date)
-    type = Column(String(10))
-    status = Column(String(10))
+    code = Column(String(10), primary_key=True)#证券代码
+    code_name = Column(String(100))#证券名称
+    ipoDate = Column(Date)#上市日期
+    outDate = Column(Date)#退市日期
+    type = Column(Enum('1', '2', '3'))#证券类型，其中1：股票，2：指数,3：其它
+    status = Column(Boolean) #上市状态，其中1：上市，0：退市
+    ts_code = Column(String(10))#ts_证券代码
     updated_on = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
     @staticmethod
@@ -42,33 +43,32 @@ def default_t_date(context):
 #-------A股K线数据表基类----------
 
 
-class D_History_A_Stock_K_Data_Base():
+class BS_Daily_Base():
     """
-    日线历史行情数据
+    BS日线历史行情数据基类
     """
-    id = Column('id', BigInteger, primary_key=True)
-    date = Column('date', String(10))
-    code = Column('code', String(10))
-    open = Column('open', String(20))
-    high = Column('high', String(20))
-    low = Column('low', String(20))
-    close = Column('close', String(20))
-    preclose = Column('preclose', String(20))
-    volume = Column('volume', String(20))
-    amount = Column('amount', String(23))
-    adjustflag = Column('adjustflag', String(1))  #复权状态(1：后复权， 2：前复权，3：不复权）
-    turn = Column('turn', String(15))
-    tradestatus = Column('tradestatus', String(1))
-    pctChg = Column('pctChg', String(15))
-    peTTM = Column('peTTM', String(20))
-    pbMRQ = Column('pbMRQ', String(20))
-    psTTM = Column('psTTM', String(20))
-    pcfNcfTTM = Column('pcfNcfTTM', String(20))
-    isST = Column('isST', String(1))
-    t_date = Column('t_date', Date, default=default_t_date)
+    id = Column('id', Integer, primary_key=True)
+    date = Column('date', Date)#交易所行情日期
+    code = Column('code', String(10))#BS证券代码 格式：sh.600000。sh：上海，sz：深圳
+    open = Column('open', Numeric(18, 4))#今开盘价格 精度：小数点后4位；单位：人民币元
+    high = Column('high', Numeric(18, 4))#最高价 精度：小数点后4位；单位：人民币元
+    low = Column('low', Numeric(18, 4))#最低价 精度：小数点后4位；单位：人民币元
+    close = Column('close', Numeric(18, 4))#今收盘价 精度：小数点后4位；单位：人民币元
+    preclose = Column('preclose', Numeric(18, 4))#昨日收盘价 精度：小数点后4位；单位：人民币元
+    volume = Column('volume', BigInteger)#成交数量 单位：股
+    amount = Column('amount', Numeric(23, 4))#成交金额	精度：小数点后4位；单位：人民币元
+    adjustflag = Column('adjustflag', Enum('1', '2', '3'))  #复权状态(1：后复权， 2：前复权，3：不复权）
+    turn = Column('turn', Numeric(18, 6))#换手率 精度：小数点后6位；单位：%
+    tradestatus = Column('tradestatus', Boolean)#交易状态	1：正常交易 0：停牌
+    pctChg = Column('pctChg', Numeric(18, 6))#涨跌幅（百分比）	精度：小数点后6位
+    peTTM = Column('peTTM', Numeric(18, 6))#滚动市盈率	精度：小数点后6位
+    psTTM = Column('psTTM', Numeric(18, 6))#滚动市销率	精度：小数点后6位
+    pcfNcfTTM = Column('pcfNcfTTM', Numeric(18, 6))#滚动市现率	精度：小数点后6位
+    pbMRQ = Column('pbMRQ', Numeric(18, 6))#市净率	精度：小数点后6位
+    isST = Column('isST', Boolean)#是否ST	1是，0否
 
 
-class W_History_A_Stock_K_Data_Base():
+class BS_Weekly_Base():
     """
     周线历史行情数据
     """
@@ -87,7 +87,7 @@ class W_History_A_Stock_K_Data_Base():
     t_date = Column('t_date', Date, default=default_t_date)
 
 
-class M_History_A_Stock_K_Data_Base():
+class BS_Monthly_Base():
     """
     月线历史行情数据
     """
@@ -106,7 +106,7 @@ class M_History_A_Stock_K_Data_Base():
     t_date = Column('t_date', Date, default=default_t_date)
 
 
-class T5_History_A_Stock_K_Data_Base():
+class BS_15m_Base():
     """
     5分钟线历史行情数据
     """
@@ -126,48 +126,50 @@ class T5_History_A_Stock_K_Data_Base():
 #-------不复权-A股K线数据----------
 
 
-class D_History_A_Stock_K_Data(D_History_A_Stock_K_Data_Base, Base):
+class BS_Daily(BS_Daily_Base, Base):
     """
     日线历史行情数据
     """
-    __tablename__ = "odl_d_history_A_stock_k_data"
+    __tablename__ = "odl_bs_daily"
 
 
-class W_History_A_Stock_K_Data(W_History_A_Stock_K_Data_Base, Base):
+class BS_Weekly(BS_Weekly_Base, Base):
     """
     周线历史行情数据
     """
-    __tablename__ = "odl_w_history_A_stock_k_data"
+    __tablename__ = "odl_bs_weekly"
 
 
-class M_History_A_Stock_K_Data(M_History_A_Stock_K_Data_Base, Base):
+class BS_Monthly(BS_Monthly_Base, Base):
     """
     月线历史行情数据
     """
-    __tablename__ = "odl_m_history_A_stock_k_data"
+    __tablename__ = "odl_bs_monthly"
 
 
 #-------前复权-A股K线数据----------
 
 
-class D2_History_A_Stock_K_Data(D_History_A_Stock_K_Data_Base, Base):
+class BS_Daily_qfq(BS_Daily_Base, Base):
     """
     前复权-日线历史行情数据
     """
-    __tablename__ = "odl_d2_history_A_stock_k_data"
+    __tablename__ = "odl_bs_daily_qfq"
 
 
 #------后复权------------
-class D1_History_A_Stock_K_Data(D_History_A_Stock_K_Data_Base, Base):
+class BS_Daily_hfq(BS_Daily_Base, Base):
     """
     后复权-日线历史行情数据
     """
-    __tablename__ = "odl_d1_history_A_stock_k_data"
+    __tablename__ = "odl_bs_daily_hfq"
+    __table_args__=(UniqueConstraint('code','date',name='UDX_CODE_DATE'),)
 
 
-class SZ50_Stocks(Base):
+
+class BS_SZ50_Stocks(Base):
     """
-    后复权-日线历史行情数据
+    上证50
     """
     __tablename__ = "odl_bs_sz50_stocks"
     id = Column('id', BigInteger, primary_key=True)
@@ -181,13 +183,13 @@ class SZ50_Stocks(Base):
         删除数据
         """
         with session_scope() as sn:
-            sn.query(SZ50_Stocks).delete()
+            sn.query(BS_SZ50_Stocks).delete()
 
 
 #-------财务数据----------
 
 
-class Profit_Data(Base):
+class BS_Profit_Data(Base):
     """
     季频盈利能力
     """

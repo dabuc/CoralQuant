@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from coralquant.models.bdl_model import DailyKData, DailyKData1, DailyKData2, MonthlyKData, MonthlyKData2, WeeklyKData, WeeklyKData2
-from coralquant.models.odl_model import D1_History_A_Stock_K_Data, D2_History_A_Stock_K_Data, D_History_A_Stock_K_Data, M_History_A_Stock_K_Data, W_History_A_Stock_K_Data
+from coralquant.models.odl_model import BS_Daily_hfq, BS_Daily_qfq, BS_Daily, BS_Monthly, BS_Weekly
 from enum import Enum, unique
 
 
@@ -22,17 +22,19 @@ class TaskEnum(Enum):
 
     季频盈利能力 = 'profit'
 
+    BS日线历史A股K线后复权数据='bs_daily_hfq'
+
     TS更新每日指标 = 'daily_basic'
     TS日线行情 = 'daily'
     TS复权因子 = 'adj_factor'
 
 
 frequency_odl_table_obj = {
-    'd': D_History_A_Stock_K_Data,
-    'w': W_History_A_Stock_K_Data,
-    'm': M_History_A_Stock_K_Data,
-    'd-2': D2_History_A_Stock_K_Data,
-    'd-1': D1_History_A_Stock_K_Data,
+    'd': BS_Daily,
+    'w': BS_Weekly,
+    'm': BS_Monthly,
+    'd-2': BS_Daily_qfq,
+    'd-1': BS_Daily_hfq,
 }
 
 frequency_bdl_table_obj = {

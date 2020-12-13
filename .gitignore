@@ -142,4 +142,5 @@ data/
 test/
 deploy.md
 test.py
+test2.py
 *.sql

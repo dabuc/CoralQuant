@@ -35,3 +35,26 @@ def convert_to_date(date: str,format: str):
         result=datetime.strptime(date, format).date()
  
     return result
+
+
+def convert_to_bscode(ts_code):
+    """
+    ts_code 转换成 bs_code
+    """
+    b = ts_code.split('.')
+    bs_code = '{}.{}'.format(b[1].lower(), b[0])
+    return bs_code
+    
+
+
+def convert_to_tscode(bs_code:str):
+    """
+    bs_code 转换成 ts_code
+
+    bs_code:sh.601398
+    ts_code:600230.SH
+    """
+    b = bs_code.split('.')
+    bs_code = '{}.{}'.format(b[1], b[0].upper())
+    return bs_code
+    

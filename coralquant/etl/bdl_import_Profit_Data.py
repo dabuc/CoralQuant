@@ -1,5 +1,5 @@
 import concurrent.futures
-from coralquant.models.odl_model import Profit_Data
+from coralquant.models.odl_model import BS_Profit_Data
 from coralquant.models.bdl_model import quarterly_Profit_Data
 from datetime import datetime
 
@@ -80,7 +80,7 @@ def import_data():
     #offset：当偏移量大于800万时，offset limit模式性能下降严重，查询一次要12秒……
     #改成直接定位主键id查询。
 
-    from_table = Profit_Data
+    from_table = BS_Profit_Data
     with concurrent.futures.ThreadPoolExecutor() as executor:
         with session_scope() as session:
             onerow = session.query(func.min(from_table.id), func.max(from_table.id)).one()

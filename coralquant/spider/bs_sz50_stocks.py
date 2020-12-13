@@ -1,4 +1,4 @@
-from coralquant.models.odl_model import SZ50_Stocks
+from coralquant.models.odl_model import BS_SZ50_Stocks
 import baostock as bs
 import pandas as pd
 from sqlalchemy import String
@@ -10,7 +10,7 @@ def get_sz50_stocks():
     获取上证50成分股数据
     """
     #删除数据
-    SZ50_Stocks.del_all_data()
+    BS_SZ50_Stocks.del_all_data()
 
     # 登陆系统
     lg = bs.login()

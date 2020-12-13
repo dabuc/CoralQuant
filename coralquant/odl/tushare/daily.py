@@ -1,7 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+日线行情
+"""
 from coralquant import logger
 from coralquant.models.odl_model import TS_Daily
 from coralquant.settings import CQ_Config
-from coralquant.crawl.tushare.util import extract_data
+from coralquant.odl.tushare.util import extract_data
 from coralquant.stringhelper import TaskEnum
 from coralquant.taskmanage import create_ts_cal_task
 import tushare as ts

@@ -4,7 +4,7 @@
 from coralquant.stringhelper import TaskEnum
 from datetime import datetime
 import click
-from coralquant.crawl.tushare import adj_factor, daily_basic, daily
+from coralquant.odl.tushare import adj_factor, daily_basic, daily
 from coralquant import taskmanage
 
 

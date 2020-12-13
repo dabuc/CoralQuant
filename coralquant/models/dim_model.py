@@ -2,7 +2,7 @@ from sqlalchemy.sql.schema import Index
 from coralquant import logger
 from datetime import date
 from coralquant.database import Base, session_scope
-from sqlalchemy import Integer, Column, Date, SmallInteger, String
+from sqlalchemy import Integer, Column, Date, SmallInteger, String, Boolean
 import datetime as dt
 
 _logger = logger.Logger(__name__).get_log()
@@ -45,3 +45,15 @@ class DIM_Date(Base):
                 sn.add(row)
 
         _logger.info('日期维度表初始化完成')
+
+
+class Dim_StockCategory(Base):
+    """
+    股票分类
+    """
+    __tablename__ = "dim_stock_cat"
+    ts_code = Column("ts_code", String(10), primary_key=True)  # TS代码
+    bs_code = Column('bs_code', String(10))
+    market = Column("market", String(3))  # 市场类型 （主板/中小板/创业板/科创板）
+    sz50 = Column('sz50', Boolean, nullable=False)#上证50
+    

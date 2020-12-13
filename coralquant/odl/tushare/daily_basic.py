@@ -1,7 +1,7 @@
 """每日指标
 """
 import concurrent.futures
-from coralquant.crawl.tushare.util import extract_data
+from coralquant.odl.tushare.util import extract_data
 from datetime import datetime
 from coralquant.stringhelper import TaskEnum
 from coralquant.models.orm_model import TaskTable

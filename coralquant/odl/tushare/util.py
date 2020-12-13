@@ -54,6 +54,7 @@ def extract_data(taskEnum: TaskEnum, pro_api_func, pro_api_func_pramas: dict, lo
                             raise
             sm.commit()
         except:
-            pass
+            sm.commit()
+            raise
         finally:
-            pass
+            sm.close()

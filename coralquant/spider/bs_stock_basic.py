@@ -1,4 +1,4 @@
-from coralquant.util.dataconvert import convert_to_date
+from coralquant.util.dataconvert import convert_to_date, convert_to_tscode, get_int_from_str
 from coralquant.models.odl_model import BS_Stock_Basic
 from datetime import datetime
 import baostock as bs
@@ -33,8 +33,13 @@ def get_stock_basic():
     result = pd.DataFrame(data_list, columns=rs.fields)
     result['updated_on']=datetime.now()
 
+    result['status'] = [None if x == "" else bool(get_int_from_str(x)) for x in result["status"]]
     result['ipoDate'] = [convert_to_date(x, '%Y-%m-%d') for x in result.ipoDate]
     result['outDate'] = [convert_to_date(x, '%Y-%m-%d') for x in result.outDate]
+    result['ts_code'] = [convert_to_tscode(x) for x in result.code]
+
+
+    
 
 
     # 输出结果集

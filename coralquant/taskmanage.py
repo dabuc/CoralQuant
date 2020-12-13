@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from coralquant.models.odl_model import BS_Stock_Basic, SZ50_Stocks, TS_Stock_Basic, TS_TradeCal
+from coralquant.models.odl_model import BS_Stock_Basic, BS_SZ50_Stocks, TS_Stock_Basic, TS_TradeCal
 from coralquant.spider.bs_stock_basic import get_stock_basic
 from coralquant import logger
 from datetime import date, datetime, timedelta
@@ -81,7 +81,7 @@ def create_task(task: TaskEnum,
                     TS_Stock_Basic,
                     BS_Stock_Basic.code == TS_Stock_Basic.bs_code).filter(TS_Stock_Basic.market == market)
             if CQ_Config.IDB_DEBUG == '1':  #如果是测试环境
-                query = query.join(SZ50_Stocks, BS_Stock_Basic.code == SZ50_Stocks.code)
+                query = query.join(BS_SZ50_Stocks, BS_Stock_Basic.code == BS_SZ50_Stocks.code)
             if status:
                 query = query.filter(BS_Stock_Basic.status == status)
             if type:
@@ -108,18 +108,56 @@ def create_task(task: TaskEnum,
     _logger.info('生成{}条任务记录'.format(len(codes)))
 
 
+def create_bs_task(task: TaskEnum):
+    """
+    创建BS任务列表
+    """
+    #删除原有的相同任务的历史任务列表
+    TaskTable.del_with_task(task)
+
+    with session_scope() as sm:
+        query=sm.query(BS_Stock_Basic.code, BS_Stock_Basic.ipoDate,BS_Stock_Basic.outDate,BS_Stock_Basic.ts_code)
+        if CQ_Config.IDB_DEBUG == '1':  #如果是测试环境
+            query = query.join(BS_SZ50_Stocks, BS_Stock_Basic.code == BS_SZ50_Stocks.code)
+        query = query.filter(BS_Stock_Basic.status == True) #取上市的
+
+        codes=query.all()
+
+        tasklist = []
+        for c in codes:
+            tasktable = TaskTable(task=task.value,
+                                  task_name=task.name,
+                                  ts_code=c.ts_code,
+                                  bs_code=c.code,
+                                  begin_date=c.ipoDate,
+                                  end_date=c.outDate if c.outDate is not None else datetime.now().date())
+            tasklist.append(tasktable)
+        sm.bulk_save_objects(tasklist)
+    _logger.info('生成{}条任务记录'.format(len(codes)))
+
+
+
+
+
+
+
+
+
+
+
+    
+
+    
+
+
 def create_ts_task(task: TaskEnum):
     """
     创建TS任务列表
     """
+    #删除原有的相同任务的历史任务列表
+    TaskTable.del_with_task(task)
 
     with session_scope() as sm:
-
-        #删除原有的相同任务的历史任务列表
-        query = sm.query(TaskTable).filter(TaskTable.task == task.value)
-        query.delete()
-        sm.commit()
-        _logger.info('任务：{}-历史任务已删除'.format(task.name))
 
         codes = sm.query(TS_Stock_Basic.ts_code, TS_Stock_Basic.bs_code, TS_Stock_Basic.list_date,
                          TS_Stock_Basic.delist_date).filter(TS_Stock_Basic.list_status == 'L').all()
