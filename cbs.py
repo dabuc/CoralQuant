@@ -15,8 +15,8 @@ def update_daily_hfq(reset):
     """
     click.confirm("正在更新BS日线后复权行情数据，是否继续？", abort=True)
 
-    if reset:
-        bs_daily_hfq.update_task()
+
+    bs_daily_hfq.update_task(reset)
 
     bs_daily_hfq.get_daily_hfq()
 

@@ -1,29 +1,60 @@
+from coralquant.models.orm_model import TaskTable
 from coralquant.taskmanage import create_bs_task
 from coralquant.util.dataconvert import get_decimal_from_str, get_int_from_str
 from coralquant import logger
-from datetime import datetime
-from coralquant.models.odl_model import BS_Daily_hfq
+from datetime import datetime as dtime
+from coralquant.models.odl_model import BS_Daily_hfq, BS_Stock_Basic
 from coralquant.stringhelper import TaskEnum
 from coralquant.odl.baostock.util import query_history_k_data_plus
-from coralquant.database import engine
-
+from coralquant.database import engine, session_scope
+from sqlalchemy import func, or_, and_
+import datetime
 _logger = logger.Logger(__name__).get_log()
+
 
 def update_task(reset: bool = False):
     """
     更新任务表
     """
-    create_bs_task(TaskEnum.BS日线历史A股K线后复权数据)
+    if reset:
+        create_bs_task(TaskEnum.BS日线历史A股K线后复权数据)
+        return
+    
+    #删除历史任务记录
+    TaskTable.del_with_task(TaskEnum.BS日线历史A股K线后复权数据)
+
+    with session_scope() as sm:
+        cte = sm.query(BS_Daily_hfq.code,
+                       func.max(BS_Daily_hfq.date).label('mx_date')).group_by(BS_Daily_hfq.code).cte('cte')
+        query = sm.query(BS_Stock_Basic.code, BS_Stock_Basic.ts_code, BS_Stock_Basic.ipoDate, BS_Stock_Basic.outDate,
+                         cte.c.mx_date)
+        query = query.join(cte, BS_Stock_Basic.code == cte.c.code, isouter=True)
+        query = query.filter(
+            or_(and_(BS_Stock_Basic.outDate == None, cte.c.mx_date < dtime.now().date()), cte.c.mx_date == None,
+                BS_Stock_Basic.outDate > cte.c.mx_date))
+
+        codes = query.all()
+        tasklist = []
+        for c in codes:
+            tasktable = TaskTable(task=TaskEnum.BS日线历史A股K线后复权数据.value,
+                                  task_name=TaskEnum.BS日线历史A股K线后复权数据.name,
+                                  ts_code=c.ts_code,
+                                  bs_code=c.code,
+                                  begin_date=c.ipoDate if c.mx_date is None else c.mx_date + datetime.timedelta(days=1),
+                                  end_date=c.outDate if c.outDate is not None else dtime.now().date())
+            tasklist.append(tasktable)
+        sm.bulk_save_objects(tasklist)
+    _logger.info('生成{}条任务记录'.format(len(codes)))
 
 
-def _load_data(dic:dict):
+def _load_data(dic: dict):
     """
     docstring
     """
-    content=dic['result']
-    bs_code=dic['bs_code']
-    frequency=dic['frequency']
-    adjustflag=dic['adjustflag']
+    content = dic['result']
+    bs_code = dic['bs_code']
+    frequency = dic['frequency']
+    adjustflag = dic['adjustflag']
 
     if content.empty:
         return
@@ -32,8 +63,8 @@ def _load_data(dic:dict):
 
     try:
 
-        content['date'] = [datetime.strptime(x, '%Y-%m-%d').date() for x in content['date']]
-        #content['code'] = 
+        content['date'] = [dtime.strptime(x, '%Y-%m-%d').date() for x in content['date']]
+        #content['code'] =
         content['open'] = [None if x == "" else get_decimal_from_str(x) for x in content["open"]]
         content['high'] = [None if x == "" else get_decimal_from_str(x) for x in content["high"]]
         content['low'] = [None if x == "" else get_decimal_from_str(x) for x in content["low"]]
@@ -41,9 +72,9 @@ def _load_data(dic:dict):
         content['preclose'] = [None if x == "" else get_decimal_from_str(x) for x in content["preclose"]]
         content['volume'] = [None if x == "" else get_int_from_str(x) for x in content["volume"]]
         content['amount'] = [None if x == "" else get_decimal_from_str(x) for x in content["amount"]]
-        #content['adjustflag'] = 
+        #content['adjustflag'] =
         content['turn'] = [None if x == "" else get_decimal_from_str(x) for x in content["turn"]]
-        content['tradestatus'] = [None if x == "" else bool(get_int_from_str(x)) for x in content["tradestatus"]] 
+        content['tradestatus'] = [None if x == "" else bool(get_int_from_str(x)) for x in content["tradestatus"]]
         content['pctChg'] = [None if x == "" else get_decimal_from_str(x) for x in content["pctChg"]]
         content['peTTM'] = [None if x == "" else get_decimal_from_str(x) for x in content["peTTM"]]
         content['psTTM'] = [None if x == "" else get_decimal_from_str(x) for x in content["psTTM"]]
@@ -62,4 +93,4 @@ def get_daily_hfq():
     按照任务表，获取BS日线后复权行情数据
     """
 
-    query_history_k_data_plus(TaskEnum.BS日线历史A股K线后复权数据,'d','1',_load_data)
+    query_history_k_data_plus(TaskEnum.BS日线历史A股K线后复权数据, 'd', '1', _load_data)

@@ -122,7 +122,7 @@ def create_bs_task(task: TaskEnum,tmpcodes=None):
                 query = query.filter(BS_Stock_Basic.code.in_(tmpcodes))
             else:
                 query = query.join(BS_SZ50_Stocks, BS_Stock_Basic.code == BS_SZ50_Stocks.code)   
-        query = query.filter(BS_Stock_Basic.status == True)  #取上市的
+        #query = query.filter(BS_Stock_Basic.status == True)  #取上市的
         
         codes = query.all()
 
