@@ -108,7 +108,7 @@ def create_task(task: TaskEnum,
     _logger.info('生成{}条任务记录'.format(len(codes)))
 
 
-def create_bs_task(task: TaskEnum):
+def create_bs_task(task: TaskEnum,tmpcodes=None):
     """
     创建BS任务列表
     """
@@ -116,12 +116,15 @@ def create_bs_task(task: TaskEnum):
     TaskTable.del_with_task(task)
 
     with session_scope() as sm:
-        query=sm.query(BS_Stock_Basic.code, BS_Stock_Basic.ipoDate,BS_Stock_Basic.outDate,BS_Stock_Basic.ts_code)
+        query = sm.query(BS_Stock_Basic.code, BS_Stock_Basic.ipoDate, BS_Stock_Basic.outDate, BS_Stock_Basic.ts_code)
         if CQ_Config.IDB_DEBUG == '1':  #如果是测试环境
-            query = query.join(BS_SZ50_Stocks, BS_Stock_Basic.code == BS_SZ50_Stocks.code)
-        query = query.filter(BS_Stock_Basic.status == True) #取上市的
-
-        codes=query.all()
+            if tmpcodes:
+                query = query.filter(BS_Stock_Basic.code.in_(tmpcodes))
+            else:
+                query = query.join(BS_SZ50_Stocks, BS_Stock_Basic.code == BS_SZ50_Stocks.code)   
+        query = query.filter(BS_Stock_Basic.status == True)  #取上市的
+        
+        codes = query.all()
 
         tasklist = []
         for c in codes:
@@ -134,20 +137,6 @@ def create_bs_task(task: TaskEnum):
             tasklist.append(tasktable)
         sm.bulk_save_objects(tasklist)
     _logger.info('生成{}条任务记录'.format(len(codes)))
-
-
-
-
-
-
-
-
-
-
-
-    
-
-    
 
 
 def create_ts_task(task: TaskEnum):
@@ -184,8 +173,8 @@ def create_ts_cal_task(task: TaskEnum):
 
     with session_scope() as sm:
         rp = sm.query(distinct(TS_TradeCal.date).label('t_date')).filter(TS_TradeCal.is_open == True,
-                                                            TS_TradeCal.date <= datetime.now().date())
-        codes=rp.all()  
+                                                                         TS_TradeCal.date <= datetime.now().date())
+        codes = rp.all()
         tasklist = []
         for c in codes:
             tasktable = TaskTable(task=task.value,
@@ -197,8 +186,6 @@ def create_ts_cal_task(task: TaskEnum):
             tasklist.append(tasktable)
         sm.bulk_save_objects(tasklist)
     _logger.info('生成{}条任务记录'.format(len(codes)))
-
-    
 
 
 if __name__ == "__main__":

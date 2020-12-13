@@ -13,7 +13,6 @@ def update_task(reset: bool = False):
     """
     更新任务表
     """
-
     create_bs_task(TaskEnum.BS日线历史A股K线后复权数据)
 
 
@@ -33,7 +32,7 @@ def _load_data(dic:dict):
 
     try:
 
-        content['date'] = [datetime.strptime(x, '%Y-%m-%d').date() for x in content.date]
+        content['date'] = [datetime.strptime(x, '%Y-%m-%d').date() for x in content['date']]
         #content['code'] = 
         content['open'] = [None if x == "" else get_decimal_from_str(x) for x in content["open"]]
         content['high'] = [None if x == "" else get_decimal_from_str(x) for x in content["high"]]
