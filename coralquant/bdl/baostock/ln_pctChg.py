@@ -81,7 +81,7 @@ def _calc_n_pctChg(df, n: int):
     计算往后N日涨跌幅
     """
     ln_pctChg = 'l{}_pctChg'.format(n)
-    tmp = df['close'].shift(-n)
+    tmp = df['close'].shift(n)
     df[ln_pctChg] = ((tmp - df['close']) / df['close'])  #.round(6)
 
 
