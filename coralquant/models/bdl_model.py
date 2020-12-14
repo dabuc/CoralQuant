@@ -6,7 +6,8 @@ from datetime import datetime
 
 from coralquant.database import Base
 from sqlalchemy import (BigInteger, Boolean, Column, Date, DateTime, Enum, Float, ForeignKey, Integer, MetaData,
-                        Numeric, String, Table)
+                        Numeric, String, UniqueConstraint)
+from sqlalchemy.orm import relationship
 
 
 class DailyKDataBase():
@@ -206,7 +207,25 @@ class DailyKTech(Base):
     wr888 = Column('wr888', Numeric(12, 4))#威廉888日指数
     
 
+class BS_LaterNPctChg(Base):
+    """
+    docstring
+    """
+    __tablename__ = "bdl_bs_ln_pctchg"
+    id = Column('id', Integer, primary_key=True)
+    code = Column('code', String(10), nullable=False)  #BS证券代码 格式：sh.600000。sh：上海，sz：深圳
+    date = Column('date', Date, nullable=False)  #交易所行情日期
+    pctChg = Column('pctChg', Numeric(18, 6))  #涨跌幅（百分比）	精度：小数点后6位
+    l5_pctChg = Column('l5_pctChg', Numeric(18, 6))  #涨跌幅（百分比）	精度：小数点后6位
+    l10_pctChg = Column('l10_pctChg', Numeric(18, 6))  #涨跌幅（百分比）	精度：小数点后6位
+    l20_pctChg = Column('l20_pctChg', Numeric(18, 6))  #涨跌幅（百分比）	精度：小数点后6位
+    l60_pctChg = Column('l60_pctChg', Numeric(18, 6))  #涨跌幅（百分比）	精度：小数点后6位
+    l120_pctChg = Column('l120_pctChg', Numeric(18, 6))  #涨跌幅（百分比）	精度：小数点后6位
+    l250_pctChg = Column('l250_pctChg', Numeric(18, 6))  #涨跌幅（百分比）	精度：小数点后6位
+    #daily_hfq_id = Column('id', Integer, ForeignKey('odl_bs_daily_hfq.id')) #关联BS_Daily_hfq的外键
 
+    __table_args__ = (UniqueConstraint('code', 'date', name='UDX_CODE_DATE'), )
+    
 
 
 if __name__ == "__main__":

@@ -24,6 +24,7 @@ class TaskTable(Base):
     begin_date = Column(Date, nullable=False)  #开始时间
     end_date = Column(Date, nullable=False)  #结束时间
     finished = Column(Boolean, default=False, nullable=False)  #是否完成
+    remark=Column(String(50))#备注信息
     create_on = Column(Date, default=datetime.now().date)
     updated_on = Column(DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 

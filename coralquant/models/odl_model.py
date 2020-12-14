@@ -6,6 +6,7 @@ from coralquant import logger
 from datetime import datetime
 from sqlalchemy import UniqueConstraint, Column, Integer, BigInteger, Numeric, String, Enum, Float, Boolean, Date, DateTime
 from coralquant.database import Base, session_scope
+from sqlalchemy.orm import relationship
 
 _logger = logger.Logger(__name__).get_log()
 
@@ -164,6 +165,7 @@ class BS_Daily_hfq(BS_Daily_Base, Base):
     """
     __tablename__ = "odl_bs_daily_hfq"
     __table_args__ = (UniqueConstraint('code', 'date', name='UDX_CODE_DATE'), )
+
 
 
 class BS_SZ50_Stocks(Base):
