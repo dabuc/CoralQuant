@@ -215,6 +215,7 @@ class BS_LaterNPctChg(Base):
     id = Column('id', Integer, primary_key=True)
     code = Column('code', String(10), nullable=False)  #BS证券代码 格式：sh.600000。sh：上海，sz：深圳
     date = Column('date', Date, nullable=False)  #交易所行情日期
+    close = Column('close', Numeric(18, 4), nullable=False)  #今收盘价 精度：小数点后4位；单位：人民币元
     pctChg = Column('pctChg', Numeric(18, 6))  #涨跌幅（百分比）	精度：小数点后6位
     l5_pctChg = Column('l5_pctChg', Numeric(18, 6))  #涨跌幅（百分比）	精度：小数点后6位
     l10_pctChg = Column('l10_pctChg', Numeric(18, 6))  #涨跌幅（百分比）	精度：小数点后6位

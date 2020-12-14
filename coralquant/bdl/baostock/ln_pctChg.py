@@ -99,7 +99,7 @@ def calc_later_n_pctChg():
                     continue
 
                 s = select([
-                    BS_Daily_hfq.id, BS_Daily_hfq.date, BS_Daily_hfq.code, BS_Daily_hfq.close, BS_Daily_hfq.pctChg
+                    BS_Daily_hfq.id,BS_Daily_hfq.code, BS_Daily_hfq.date,  BS_Daily_hfq.close, BS_Daily_hfq.pctChg
                 ]).where(and_(BS_Daily_hfq.code == task.bs_code,
                               BS_Daily_hfq.date >= task.begin_date)).order_by(desc(BS_Daily_hfq.date))
 
@@ -121,24 +121,12 @@ def _load_data(df: DataFrame, bs_code, remark):
     """
     更新 BS_LaterNPctChg 数据表
     """
-
-    with session_scope() as sm:
-        if remark == 'INSERT':
-            laterNPctChglist=[]
-            for i in df.itertuples():
-                laterNPctChg = BS_LaterNPctChg(code=i.code,
-                                        date=i.date,
-                                        pctChg=_set_pctChg(i.pctChg) ,
-                                        l5_pctChg=_set_pctChg(i.l5_pctChg),
-                                        l10_pctChg=_set_pctChg(i.l10_pctChg),
-                                        l20_pctChg=_set_pctChg(i.l20_pctChg),
-                                        l60_pctChg=_set_pctChg(i.l60_pctChg),
-                                        l120_pctChg=_set_pctChg(i.l120_pctChg),
-                                        l250_pctChg=_set_pctChg(i.l250_pctChg))
-                laterNPctChglist.append(laterNPctChg)
-            sm.bulk_save_objects(laterNPctChglist)
-            sm.commit()
-        else:
+    if remark == 'INSERT':    
+        df = df.replace([np.inf, -np.inf], np.nan)    
+        df.to_sql(BS_LaterNPctChg.__tablename__, engine, schema='stock_dw', if_exists='append', index=False)
+    
+    else:
+        with session_scope() as sm:
             rq = sm.query(BS_LaterNPctChg).filter(BS_LaterNPctChg.code == bs_code)
             rq = rq.filter(BS_LaterNPctChg.l250_pctChg == None)
             for row in rq:
