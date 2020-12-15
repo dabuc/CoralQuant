@@ -318,6 +318,7 @@ class TS_Daily_Basic(Base):
     free_share = Column("free_share", Numeric(18, 5))  # 自由流通股本 （万）12,4
     total_mv = Column("total_mv", Numeric(18, 5))  # 总市值 （万元）14,4
     circ_mv = Column("circ_mv", Numeric(18, 5))  # 流通市值（万元）14,4
+    bs_code = Column("bs_code", String(10), nullable=False)  # TS股票代码
 
 
 class TS_TradeCal(Base):
