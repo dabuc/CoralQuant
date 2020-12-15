@@ -1,43 +1,47 @@
 # -*- coding: utf-8 -*-
 """配置文件"""
-import os, sys
+import os
 from dotenv import load_dotenv
+
 load_dotenv()
 base_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
-class BaseConfig():
+
+class BaseConfig:
     """
     基本配置类
     """
-    IDB_DEBUG = '0'
-    DATABASE_URL = os.getenv("DATABASE_URL",'')
-    TUSHARE_TOKEN= os.getenv("TUSHARE_TOKEN",'')
-    LOG_PATH=os.getenv("LOG_PATH",base_dir+'/logs/coralquant.log')
-    BARK_HOST=os.getenv("BARK_HOST",'')
-    BARK_KEY=os.getenv("BARK_KEY",'')
+
+    IDB_DEBUG = "0"
+    TUSHARE_TOKEN = os.getenv("TUSHARE_TOKEN", "")
+    LOG_PATH = os.getenv("LOG_PATH", base_dir + "/logs/coralquant.log")
+    BARK_HOST = os.getenv("BARK_HOST", "")
+    BARK_KEY = os.getenv("BARK_KEY", "")
+
 
 class DevelopmentConfig(BaseConfig):
     """
     开发配置类
     """
-    IDB_DEBUG = '1'
+
+    IDB_DEBUG = "1"
+    DB_SCHEMA = "{}_test".format(os.getenv("DB_SCHEMA"))
+    DATABASE_URL = "{}_test".format(os.getenv("DATABASE_URL"))
+
 
 class ProductionConfig(BaseConfig):
     """
     生成环境正式配置类
     """
+    DB_SCHEMA = os.getenv("DB_SCHEMA", "")
+    DATABASE_URL = os.getenv("DATABASE_URL", "")
     pass
 
-config={
-    'development':DevelopmentConfig,
-    'production':ProductionConfig
-}
 
-config_name = os.getenv("CQ_CONFIG", 'development')
-CQ_Config= config[config_name]()
+config = {"development": DevelopmentConfig, "production": ProductionConfig}
 
-
-
+config_name = os.getenv("CQ_CONFIG", "development")
+CQ_Config = config[config_name]()
 
 
 if __name__ == "__main__":

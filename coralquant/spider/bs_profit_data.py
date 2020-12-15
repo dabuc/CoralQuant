@@ -9,7 +9,7 @@ import baostock as bs
 import pandas as pd
 import concurrent.futures
 from coralquant.database import engine, session_scope
-
+from coralquant.settings import CQ_Config
 
 
 _logger = logger.Logger(__name__).get_log()
@@ -31,7 +31,7 @@ def _save_date(dflist:list,code:str):
     保存数据
     """
     result_profit = pd.concat(dflist)
-    result_profit.to_sql('odl_bs_profit_data', engine, schema='stock_dw', if_exists='append', index=False)
+    result_profit.to_sql('odl_bs_profit_data', engine, schema=CQ_Config.DB_SCHEMA, if_exists='append', index=False)
     _logger.info('{}: 保存数据成功'.format(code))
 
 

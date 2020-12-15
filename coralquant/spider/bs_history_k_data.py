@@ -10,6 +10,7 @@ from coralquant.stringhelper import TaskEnum
 from coralquant.database import engine, session_scope, del_table_data
 import concurrent.futures
 from coralquant.stringhelper import frequency_odl_table_obj
+from coralquant.settings import CQ_Config
 
 _logger = logger.Logger(__name__).get_log()
 
@@ -41,7 +42,7 @@ def _parse_data(content, ts_code, frequency, adjustflag):
 
     try:
         content['t_date'] = [datetime.strptime(x, '%Y-%m-%d').date() for x in content.date]
-        content.to_sql(table_name, engine, schema='stock_dw', if_exists='append', index=False)
+        content.to_sql(table_name, engine, schema=CQ_Config.DB_SCHEMA, if_exists='append', index=False)
     except Exception as e:  #traceback.format_exc(1)
         _logger.error('{}保存出错/{}'.format(ts_code, repr(e)))
     # else:

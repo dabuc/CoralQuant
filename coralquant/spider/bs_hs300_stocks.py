@@ -2,7 +2,7 @@ import baostock as bs
 import pandas as pd
 from sqlalchemy import String
 from coralquant.database import engine
-
+from coralquant.settings import CQ_Config
 
 def get_hs300_stocks():
     """
@@ -31,7 +31,7 @@ def get_hs300_stocks():
 
     dtype = {'updateDate': String(10), 'code': String(9), 'code_name': String(10)}
 
-    result.to_sql('odl_bs_hs300_stocks', engine, schema='stock_dw', if_exists='replace', index=False, dtype=dtype)
+    result.to_sql('odl_bs_hs300_stocks', engine, schema=CQ_Config.DB_SCHEMA, if_exists='replace', index=False, dtype=dtype)
 
     # 登出系统
     bs.logout()

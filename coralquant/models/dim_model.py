@@ -55,5 +55,4 @@ class Dim_StockCategory(Base):
     ts_code = Column("ts_code", String(10), primary_key=True)  # TS代码
     bs_code = Column('bs_code', String(10))
     market = Column("market", String(3))  # 市场类型 （主板/中小板/创业板/科创板）
-    sz50 = Column('sz50', Boolean, nullable=False)#上证50
-    
+    sz50 = Column('sz50', Boolean, nullable=False)  #上证50

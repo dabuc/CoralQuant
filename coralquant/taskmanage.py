@@ -3,8 +3,8 @@ from coralquant.models.odl_model import BS_Stock_Basic, BS_SZ50_Stocks, TS_Stock
 from coralquant.spider.bs_stock_basic import get_stock_basic
 from coralquant import logger
 from datetime import date, datetime, timedelta
-from sqlalchemy import MetaData, Table, insert, select
-from coralquant.database import engine, session_scope
+from sqlalchemy import MetaData
+from coralquant.database import session_scope
 from coralquant.settings import CQ_Config
 from coralquant.models.orm_model import TaskTable
 from coralquant.stringhelper import TaskEnum, frequency_bdl_table_obj
@@ -24,16 +24,16 @@ def update_task_table(task: TaskEnum, market: str = None):
     """
     get_stock_basic()
 
-    begin_date = datetime.strptime('1990-12-19', "%Y-%m-%d").date()
+    begin_date = datetime.strptime("1990-12-19", "%Y-%m-%d").date()
     end_date = datetime.now().date()
 
-    create_task(task, begin_date, end_date, type='1', market=market, isdel=True)  #股票
+    create_task(task, begin_date, end_date, type="1", market=market, isdel=True)  # 股票
     if not market:
-        create_task(task, begin_date, end_date, type='2')  #指数
+        create_task(task, begin_date, end_date, type="2")  # 指数
 
     tbl = frequency_bdl_table_obj[task.value]
     with session_scope() as sn:
-        rq = sn.query(tbl.code, func.max(tbl.date).label('m_date')).group_by(tbl.code).all()
+        rq = sn.query(tbl.code, func.max(tbl.date).label("m_date")).group_by(tbl.code).all()
         task_query = sn.query(TaskTable).filter(TaskTable.task == task.value).all()
 
         for row in rq:
@@ -42,17 +42,19 @@ def update_task_table(task: TaskEnum, market: str = None):
                 if taskrow.ts_code == row.code:
                     taskrow.begin_date = row.m_date + timedelta(1)
 
-    _logger.info('任务表更新完成')
+    _logger.info("任务表更新完成")
 
 
-def create_task(task: TaskEnum,
-                begin_date: date,
-                end_date: date,
-                codes: list = [],
-                type: str = None,
-                status: str = None,
-                market: str = None,
-                isdel=False):
+def create_task(
+    task: TaskEnum,
+    begin_date: date,
+    end_date: date,
+    codes: list = [],
+    type: str = None,
+    status: str = None,
+    market: str = None,
+    isdel=False,
+):
     """创建任务
 
     :param task: 任务类型
@@ -77,10 +79,10 @@ def create_task(task: TaskEnum,
         if not codes:
             query = sm.query(BS_Stock_Basic.code, BS_Stock_Basic.ipoDate)
             if market:
-                query = query.join(
-                    TS_Stock_Basic,
-                    BS_Stock_Basic.code == TS_Stock_Basic.bs_code).filter(TS_Stock_Basic.market == market)
-            if CQ_Config.IDB_DEBUG == '1':  #如果是测试环境
+                query = query.join(TS_Stock_Basic, BS_Stock_Basic.code == TS_Stock_Basic.bs_code).filter(
+                    TS_Stock_Basic.market == market
+                )
+            if CQ_Config.IDB_DEBUG == "1":  # 如果是测试环境
                 query = query.join(BS_SZ50_Stocks, BS_Stock_Basic.code == BS_SZ50_Stocks.code)
             if status:
                 query = query.filter(BS_Stock_Basic.status == status)
@@ -89,103 +91,117 @@ def create_task(task: TaskEnum,
             codes = query.all()
 
         if isdel:
-            #删除原有的相同任务的历史任务列表
+            # 删除原有的相同任务的历史任务列表
             query = sm.query(TaskTable).filter(TaskTable.task == task.value)
             query.delete()
             sm.commit()
-            _logger.info('任务：{}-历史任务已删除'.format(task.name))
+            _logger.info("任务：{}-历史任务已删除".format(task.name))
 
         tasklist = []
         for c in codes:
-            tasktable = TaskTable(task=task.value,
-                                  task_name=task.name,
-                                  ts_code=c.code,
-                                  begin_date=begin_date if begin_date is not None else c.ipoDate,
-                                  end_date=end_date)
+            tasktable = TaskTable(
+                task=task.value,
+                task_name=task.name,
+                ts_code=c.code,
+                begin_date=begin_date if begin_date is not None else c.ipoDate,
+                end_date=end_date,
+            )
             tasklist.append(tasktable)
         sm.bulk_save_objects(tasklist)
 
-    _logger.info('生成{}条任务记录'.format(len(codes)))
+    _logger.info("生成{}条任务记录".format(len(codes)))
 
 
-def create_bs_task(task: TaskEnum,tmpcodes=None):
+def create_bs_task(task: TaskEnum, tmpcodes=None):
     """
     创建BS任务列表
     """
-    #删除原有的相同任务的历史任务列表
+    # 删除原有的相同任务的历史任务列表
     TaskTable.del_with_task(task)
 
     with session_scope() as sm:
         query = sm.query(BS_Stock_Basic.code, BS_Stock_Basic.ipoDate, BS_Stock_Basic.outDate, BS_Stock_Basic.ts_code)
-        if CQ_Config.IDB_DEBUG == '1':  #如果是测试环境
+        if CQ_Config.IDB_DEBUG == "1":  # 如果是测试环境
             if tmpcodes:
                 query = query.filter(BS_Stock_Basic.code.in_(tmpcodes))
             else:
-                query = query.join(BS_SZ50_Stocks, BS_Stock_Basic.code == BS_SZ50_Stocks.code)   
-        #query = query.filter(BS_Stock_Basic.status == True)  #取上市的
-        
+                query = query.join(BS_SZ50_Stocks, BS_Stock_Basic.code == BS_SZ50_Stocks.code)
+        # query = query.filter(BS_Stock_Basic.status == True)  #取上市的
+
         codes = query.all()
 
         tasklist = []
         for c in codes:
-            tasktable = TaskTable(task=task.value,
-                                  task_name=task.name,
-                                  ts_code=c.ts_code,
-                                  bs_code=c.code,
-                                  begin_date=c.ipoDate,
-                                  end_date=c.outDate if c.outDate is not None else datetime.now().date())
+            tasktable = TaskTable(
+                task=task.value,
+                task_name=task.name,
+                ts_code=c.ts_code,
+                bs_code=c.code,
+                begin_date=c.ipoDate,
+                end_date=c.outDate if c.outDate is not None else datetime.now().date(),
+            )
             tasklist.append(tasktable)
         sm.bulk_save_objects(tasklist)
-    _logger.info('生成{}条任务记录'.format(len(codes)))
+    _logger.info("生成{}条任务记录".format(len(codes)))
 
 
 def create_ts_task(task: TaskEnum):
     """
     创建TS任务列表
     """
-    #删除原有的相同任务的历史任务列表
+    # 删除原有的相同任务的历史任务列表
     TaskTable.del_with_task(task)
 
     with session_scope() as sm:
 
-        codes = sm.query(TS_Stock_Basic.ts_code, TS_Stock_Basic.bs_code, TS_Stock_Basic.list_date,
-                         TS_Stock_Basic.delist_date).filter(TS_Stock_Basic.list_status == 'L').all()
+        codes = (
+            sm.query(
+                TS_Stock_Basic.ts_code, TS_Stock_Basic.bs_code, TS_Stock_Basic.list_date, TS_Stock_Basic.delist_date
+            )
+            .filter(TS_Stock_Basic.list_status == "L")
+            .all()
+        )
 
         tasklist = []
         for c in codes:
-            tasktable = TaskTable(task=task.value,
-                                  task_name=task.name,
-                                  ts_code=c.ts_code,
-                                  bs_code=c.bs_code,
-                                  begin_date=c.list_date,
-                                  end_date=c.delist_date if c.delist_date is not None else datetime.now().date())
+            tasktable = TaskTable(
+                task=task.value,
+                task_name=task.name,
+                ts_code=c.ts_code,
+                bs_code=c.bs_code,
+                begin_date=c.list_date,
+                end_date=c.delist_date if c.delist_date is not None else datetime.now().date(),
+            )
             tasklist.append(tasktable)
         sm.bulk_save_objects(tasklist)
-    _logger.info('生成{}条任务记录'.format(len(codes)))
+    _logger.info("生成{}条任务记录".format(len(codes)))
 
 
 def create_ts_cal_task(task: TaskEnum):
     """
     创建基于交易日历的任务列表
     """
-    #删除历史任务
+    # 删除历史任务
     TaskTable.del_with_task(task)
 
     with session_scope() as sm:
-        rp = sm.query(distinct(TS_TradeCal.date).label('t_date')).filter(TS_TradeCal.is_open == True,
-                                                                         TS_TradeCal.date <= datetime.now().date())
+        rp = sm.query(distinct(TS_TradeCal.date).label("t_date")).filter(
+            TS_TradeCal.is_open == True, TS_TradeCal.date <= datetime.now().date() # noqa
+        )
         codes = rp.all()
         tasklist = []
         for c in codes:
-            tasktable = TaskTable(task=task.value,
-                                  task_name=task.name,
-                                  ts_code='按日期更新',
-                                  bs_code='按日期更新',
-                                  begin_date=c.t_date,
-                                  end_date=c.t_date)
+            tasktable = TaskTable(
+                task=task.value,
+                task_name=task.name,
+                ts_code="按日期更新",
+                bs_code="按日期更新",
+                begin_date=c.t_date,
+                end_date=c.t_date,
+            )
             tasklist.append(tasktable)
         sm.bulk_save_objects(tasklist)
-    _logger.info('生成{}条任务记录'.format(len(codes)))
+    _logger.info("生成{}条任务记录".format(len(codes)))
 
 
 if __name__ == "__main__":

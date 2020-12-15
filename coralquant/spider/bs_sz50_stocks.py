@@ -3,7 +3,7 @@ import baostock as bs
 import pandas as pd
 from sqlalchemy import String
 from coralquant.database import engine
-
+from coralquant.settings import CQ_Config
 
 def get_sz50_stocks():
     """
@@ -31,7 +31,7 @@ def get_sz50_stocks():
         sz50_stocks.append(rs.get_row_data())
     result = pd.DataFrame(sz50_stocks, columns=rs.fields)
 
-    result.to_sql('odl_bs_sz50_stocks', engine, schema='stock_dw', if_exists='append', index=False)
+    result.to_sql('odl_bs_sz50_stocks', engine, schema=CQ_Config.DB_SCHEMA, if_exists='append', index=False)
 
     # 登出系统
     bs.logout()

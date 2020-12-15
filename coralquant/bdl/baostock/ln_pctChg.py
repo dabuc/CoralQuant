@@ -20,6 +20,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 import concurrent.futures
+from coralquant.settings import CQ_Config
 
 _logger = logger.Logger(__name__).get_log()
 
@@ -123,7 +124,7 @@ def _load_data(df: DataFrame, bs_code, remark):
     """
     if remark == 'INSERT':    
         df = df.replace([np.inf, -np.inf], np.nan)    
-        df.to_sql(BS_LaterNPctChg.__tablename__, engine, schema='stock_dw', if_exists='append', index=False)
+        df.to_sql(BS_LaterNPctChg.__tablename__, engine, schema=CQ_Config.DB_SCHEMA, if_exists='append', index=False)
     
     else:
         with session_scope() as sm:

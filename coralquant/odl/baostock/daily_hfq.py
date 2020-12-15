@@ -9,6 +9,7 @@ from coralquant.odl.baostock.util import query_history_k_data_plus
 from coralquant.database import engine, session_scope
 from sqlalchemy import func, or_, and_
 import datetime
+from coralquant.settings import CQ_Config
 _logger = logger.Logger(__name__).get_log()
 
 
@@ -83,7 +84,7 @@ def _load_data(dic: dict):
         content['pbMRQ'] = [None if x == "" else get_decimal_from_str(x) for x in content["pbMRQ"]]
         content['isST'] = [None if x == "" else bool(get_int_from_str(x)) for x in content["isST"]]
 
-        content.to_sql(table_name, engine, schema='stock_dw', if_exists='append', index=False)
+        content.to_sql(table_name, engine, schema=CQ_Config.DB_SCHEMA, if_exists='append', index=False)
 
     except Exception as e:  #traceback.format_exc(1)
         _logger.error('{}保存出错/{}'.format(bs_code, repr(e)))

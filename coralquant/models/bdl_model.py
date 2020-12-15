@@ -82,44 +82,6 @@ class DailyKData(DailyKDataBase, Base):
     __tablename__ = "bdl_bs_daily_k_data"
 
 
-class WeeklyKData(WeeklyKDataBase, Base):
-    """
-    周线数据
-    """
-    __tablename__ = "bdl_bs_weekly_k_data"
-
-
-class MonthlyKData(MonthlyKDataBase, Base):
-    """
-    月线数据
-    """
-    __tablename__ = "bdl_bs_monthly_k_data"
-
-
-#-------前复权-----------
-
-
-class DailyKData2(DailyKDataBase, Base):
-    """
-    日线数据
-    """
-    __tablename__ = "bdl_bs_daily_2k_data"
-
-
-class WeeklyKData2(WeeklyKDataBase, Base):
-    """
-    周线数据
-    """
-    __tablename__ = "bdl_bs_weekly_2k_data"
-
-
-class MonthlyKData2(MonthlyKDataBase, Base):
-    """
-    月线数据
-    """
-    __tablename__ = "bdl_bs_monthly_2k_data"
-
-
 #---------后复权--------------
 class DailyKData1(DailyKDataBase, Base):
     """

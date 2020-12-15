@@ -44,7 +44,7 @@ def get_stock_basic():
 
     result['bs_code'] = [convert_to_bscode(x) for x in result.ts_code]
 
-    result.to_sql('odl_ts_stock_basic', engine, schema='stock_dw', if_exists='append', index=False)
+    result.to_sql('odl_ts_stock_basic', engine, schema=CQ_Config.DB_SCHEMA, if_exists='append', index=False)
 
 
 if __name__ == "__main__":

@@ -4,7 +4,7 @@ from datetime import datetime
 import baostock as bs
 import pandas as pd
 from coralquant.database import engine
-
+from coralquant.settings import CQ_Config
 
 def get_stock_basic():
     """
@@ -45,7 +45,7 @@ def get_stock_basic():
     # 输出结果集
     result.to_sql('odl_bs_stock_basic',
                 engine,
-                schema='stock_dw',
+                schema=CQ_Config.DB_SCHEMA,
                 if_exists='append',
                 index=False)
 

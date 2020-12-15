@@ -10,8 +10,8 @@ from sqlalchemy import String
 from coralquant.database import engine
 
 
-
 _logger = logger.Logger(__name__).get_log()
+
 
 def update_task():
     """
@@ -27,23 +27,16 @@ def get_adj_factor():
 
     pro_api = ts.pro_api(CQ_Config.TUSHARE_TOKEN)
     pro_api_func = pro_api.adj_factor
-    extract_data(
-        TaskEnum.TS复权因子,
-        pro_api_func,
-        {},
-        _load_data,
-        {},
-        '日线行情'
-    )
+    extract_data(TaskEnum.TS复权因子, pro_api_func, {}, _load_data, {}, "日线行情")
 
 
-def _load_data(dic:dict):
+def _load_data(dic: dict):
     """
     做一些简单转换后，加载数据到数据库
     """
-    
-    content=dic['result']
-    task_date=dic['task_date']
+
+    content = dic["result"]
+    task_date = dic["task_date"]
 
     table_name = TS_Adj_Factor.__tablename__
 
@@ -51,10 +44,10 @@ def _load_data(dic:dict):
         return
 
     try:
-        content['trade_date'] = [parse(x).date() for x in content.trade_date]
-        dtype = {'ts_code': String(10)}
+        content["trade_date"] = [parse(x).date() for x in content.trade_date]
+        dtype = {"ts_code": String(10)}
 
-        content.to_sql(table_name, engine, schema='stock_dw', if_exists='append', index=False, dtype=dtype)
-        
+        content.to_sql(table_name, engine, schema=CQ_Config.DB_SCHEMA, if_exists="append", index=False, dtype=dtype)
+
     except Exception as e:
-        _logger.error('{}-日线行情保存出错/{}'.format(task_date, repr(e)))
+        _logger.error("{}-日线行情保存出错/{}".format(task_date, repr(e)))

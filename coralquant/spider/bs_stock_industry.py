@@ -2,7 +2,7 @@ import baostock as bs
 import pandas as pd
 from coralquant.database import engine
 from sqlalchemy import String
-
+from coralquant.settings import CQ_Config
 
 def create_stock_industry():
     """
@@ -34,7 +34,7 @@ def create_stock_industry():
         'industryClassification': String(6)
     }
 
-    result.to_sql('odl_bs_stock_industry', engine, schema='stock_dw', if_exists='replace', index=False, dtype=dtype)
+    result.to_sql('odl_bs_stock_industry', engine, schema=CQ_Config.DB_SCHEMA, if_exists='replace', index=False, dtype=dtype)
 
     # 登出系统
     bs.logout()
