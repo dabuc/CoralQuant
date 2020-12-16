@@ -7,42 +7,12 @@ from sqlalchemy import MetaData
 from coralquant.database import session_scope
 from coralquant.settings import CQ_Config
 from coralquant.models.orm_model import TaskTable
-from coralquant.stringhelper import TaskEnum, frequency_bdl_table_obj
+from coralquant.stringhelper import TaskEnum
 from sqlalchemy import func, distinct
 
 _logger = logger.Logger(__name__).get_log()
 
 meta = MetaData()
-
-
-def update_task_table(task: TaskEnum, market: str = None):
-    """
-    更新任务表
-        1.获取最新bs-A股股票列表
-        2.创建任务表
-        3.根据依据导入的数据，更新任务表时间
-    """
-    get_stock_basic()
-
-    begin_date = datetime.strptime("1990-12-19", "%Y-%m-%d").date()
-    end_date = datetime.now().date()
-
-    create_task(task, begin_date, end_date, type="1", market=market, isdel=True)  # 股票
-    if not market:
-        create_task(task, begin_date, end_date, type="2")  # 指数
-
-    tbl = frequency_bdl_table_obj[task.value]
-    with session_scope() as sn:
-        rq = sn.query(tbl.code, func.max(tbl.date).label("m_date")).group_by(tbl.code).all()
-        task_query = sn.query(TaskTable).filter(TaskTable.task == task.value).all()
-
-        for row in rq:
-
-            for taskrow in task_query:
-                if taskrow.ts_code == row.code:
-                    taskrow.begin_date = row.m_date + timedelta(1)
-
-    _logger.info("任务表更新完成")
 
 
 def create_task(
@@ -186,7 +156,7 @@ def create_ts_cal_task(task: TaskEnum):
 
     with session_scope() as sm:
         rp = sm.query(distinct(TS_TradeCal.date).label("t_date")).filter(
-            TS_TradeCal.is_open == True, TS_TradeCal.date <= datetime.now().date() # noqa
+            TS_TradeCal.is_open == True, TS_TradeCal.date <= datetime.now().date()  # noqa
         )
         codes = rp.all()
         tasklist = []

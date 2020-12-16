@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 """命令工具"""
-from coralquant.etl.bdl_daily_tech import update_daily_tech_data
 from datetime import datetime
 
 import click
 
 from coralquant import taskmanage
 from coralquant.database import del_table_data
-from coralquant.etl import bdl_import_k_data, bdl_import_Profit_Data
+from coralquant.etl import bdl_import_Profit_Data
 from coralquant.models.dim_model import DIM_Date
 from coralquant.spider import (
     bs_hs300_stocks,
@@ -18,9 +17,7 @@ from coralquant.spider import (
     bs_zz500_stocks,
     ts_stock_basic,
 )
-from coralquant.spider.bs_history_k_data import init_history_k_data_plus
 from coralquant.stringhelper import TaskEnum
-from coralquant.taskmanage import update_task_table
 
 
 @click.group()
@@ -43,62 +40,7 @@ def update_bs_stock_basic():
     click.echo("bs-A股股票列表更新完成。")
 
 
-@cli.command()
-@click.option("-f", type=click.Choice(["d", "w", "m", "5"]), prompt=True, help="d：日线数据，w：周线数据，m：月线数据")
-@click.option("-a", type=click.Choice(["1", "2", "3"]), default="3", help="1：后复权；2：前复权; 3：不复权；默认不复权")
-@click.option("-m", type=click.Choice(["主板", "中小板", "创业板", "NULL", ""]), default="", help="选择市场板块")
-@click.pass_context
-def init_history_k_data(ctx, f, a, m):
-    """创建新的任务列表，初始化历史k线数据"""
-    click.confirm("正在初始化 {}-{} 历史k线数据，是否继续？".format(f, a), abort=True)
 
-    if a != "3":
-        taskenum_key = "{}-{}".format(f, a)
-    else:
-        taskenum_key = f
-
-    taskEnum = TaskEnum(taskenum_key)
-    taskvalue = taskEnum.value
-
-    if m == "":
-        ctx.invoke(create_task, n=taskvalue, bd="1990-12-19", t=1, d=1)
-        ctx.invoke(create_task, n=taskvalue, bd="1990-12-19", t=2, d=0)
-    else:
-        ctx.invoke(create_task, n=taskvalue, bd="1990-12-19", t=1, m=m, d=1)
-        ctx.invoke(create_task, n=taskvalue, bd="1990-12-19", t=2, m=m, d=0)
-
-    init_history_k_data_plus(f, a)
-    click.echo("{}-{} 线数据初始化完成。".format(f, a))
-
-
-@cli.command()
-@click.option("-f", type=click.Choice(["d", "w", "m", "5"]), prompt=True, help="d：日线数据，w：周线数据，m：月线数据")
-@click.option("-a", type=click.Choice(["1", "2", "3"]), default="3", help="1：后复权；2：前复权; 3：不复权；默认不复权")
-@click.option("-m", type=click.Choice(["主板", "中小板", "创业板", "NULL", ""]), default="", help="选择市场板块")
-def update_history_k_data(f, a, m):
-    """创建新的任务列表，更新历史k线数据"""
-
-    if a != "3":
-        taskenum_key = "{}-{}".format(f, a)
-    else:
-        taskenum_key = f
-
-    taskEnum = TaskEnum(taskenum_key)
-    click.confirm("准备更新-{}，是否继续？".format(taskEnum.name), abort=True)
-    # 更新任务
-    update_task_table(taskEnum, m)
-    init_history_k_data_plus(f, a)
-    click.echo("{}-线数据更新完成。".format(taskEnum.name))
-
-
-@cli.command()
-@click.option("-f", type=click.Choice(["d", "w", "m"]), prompt=True, help="d：日线数据，w：导入周线数据，m：导入月线数据")
-@click.option("-a", type=click.Choice(["1", "2", "3"]), default="3", help="1：后复权；2：前复权; 3：不复权；默认不复权")
-def import_dwm_data(f, a):
-    """导入K线数据"""
-    click.confirm("正在导入导入ODL-k线数据，是否继续？", abort=True)
-    bdl_import_k_data.import_data(f, a)
-    click.echo("ODL周月线数据导入完成。")
 
 
 @cli.command()
@@ -191,16 +133,6 @@ def ETL_Profit_Data():
 
     click.echo("到入季频盈利能力数据完成")
 
-
-@cli.command()
-def update_daily_tech():
-    """
-    更新日线技术指标数据
-    """
-    click.confirm("正在更新日线技术指标数据，是否继续？", abort=True)
-    update_daily_tech_data(taskEnum=TaskEnum.日线历史A股K线数据)
-
-    click.echo("更新日线技术指标数据完成")
 
 
 def main():

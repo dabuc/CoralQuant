@@ -8,6 +8,7 @@ from coralquant.database import get_new_session
 from tqdm import tqdm
 import time
 import copy
+from sqlalchemy import desc
 
 _logger = logger.Logger(__name__).get_log()
 
@@ -26,9 +27,10 @@ def extract_data(
     with concurrent.futures.ThreadPoolExecutor() as executor:
         sm = get_new_session()
         try:
-            rp = sm.query(TaskTable).filter(TaskTable.task == taskEnum.value, TaskTable.finished == False) # noqa
+            rp = sm.query(TaskTable).filter(TaskTable.task == taskEnum.value, TaskTable.finished == False)  # noqa
             if CQ_Config.IDB_DEBUG == "1":  # 如果是测试环境
-                rp = rp.limit(10)
+                rp = rp.order_by(desc(TaskTable.begin_date))
+                rp = rp.limit(30)
 
             rp = rp.all()
 
@@ -69,7 +71,7 @@ def extract_data(
                             _logger.error("获取[{}]{}失败/{}".format(task.ts_code, log_desc, repr(e)))
                             raise
             sm.commit()
-        except: # noqa
+        except:  # noqa
             sm.commit()
             raise
         finally:

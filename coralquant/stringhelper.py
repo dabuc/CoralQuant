@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from coralquant.models.bdl_model import DailyKData, DailyKData1
-from coralquant.models.odl_model import BS_Daily_hfq, BS_Daily_qfq, BS_Daily, BS_Monthly, BS_Weekly
 from enum import Enum, unique
 
 
@@ -29,14 +27,3 @@ class TaskEnum(Enum):
     TS更新每日指标 = "daily_basic"
     TS日线行情 = "daily"
     TS复权因子 = "adj_factor"
-
-
-frequency_odl_table_obj = {
-    "d": BS_Daily,
-    "w": BS_Weekly,
-    "m": BS_Monthly,
-    "d-2": BS_Daily_qfq,
-    "d-1": BS_Daily_hfq,
-}
-
-frequency_bdl_table_obj = {"d": DailyKData, "d-1": DailyKData1}

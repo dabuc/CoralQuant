@@ -18,7 +18,6 @@ from sqlalchemy import (
     DateTime,
 )
 from coralquant.database import Base, session_scope
-from sqlalchemy.orm import relationship
 
 _logger = logger.Logger(__name__).get_log()
 
@@ -144,39 +143,39 @@ class BS_15m_Base:
 # -------不复权-A股K线数据----------
 
 
-class BS_Daily(BS_Daily_Base, Base):
-    """
-    日线历史行情数据
-    """
+# class BS_Daily(BS_Daily_Base, Base):
+#     """
+#     日线历史行情数据
+#     """
 
-    __tablename__ = "odl_bs_daily"
-
-
-class BS_Weekly(BS_Weekly_Base, Base):
-    """
-    周线历史行情数据
-    """
-
-    __tablename__ = "odl_bs_weekly"
+#     __tablename__ = "odl_bs_daily"
 
 
-class BS_Monthly(BS_Monthly_Base, Base):
-    """
-    月线历史行情数据
-    """
+# class BS_Weekly(BS_Weekly_Base, Base):
+#     """
+#     周线历史行情数据
+#     """
 
-    __tablename__ = "odl_bs_monthly"
+#     __tablename__ = "odl_bs_weekly"
+
+
+# class BS_Monthly(BS_Monthly_Base, Base):
+#     """
+#     月线历史行情数据
+#     """
+
+#     __tablename__ = "odl_bs_monthly"
 
 
 # -------前复权-A股K线数据----------
 
 
-class BS_Daily_qfq(BS_Daily_Base, Base):
-    """
-    前复权-日线历史行情数据
-    """
+# class BS_Daily_qfq(BS_Daily_Base, Base):
+#     """
+#     前复权-日线历史行情数据
+#     """
 
-    __tablename__ = "odl_bs_daily_qfq"
+#     __tablename__ = "odl_bs_daily_qfq"
 
 
 # ------后复权------------

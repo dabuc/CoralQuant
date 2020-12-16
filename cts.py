@@ -15,7 +15,7 @@ def cli():
 
 @cli.command()
 def update_daily_basic():
-    """更新每日指标
+    """按日期更新每日指标
     """
     click.confirm("正在更新每日指标，是否继续？", abort=True)
     daily_basic.update_task()
