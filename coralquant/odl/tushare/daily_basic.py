@@ -67,8 +67,6 @@ def _parse_data(dic: dict):
     try:
         content["trade_date"] = [parse(x).date() for x in content.trade_date]
         content["bs_code"] = [convert_to_bscode(x) for x in content.ts_code]
-        
-
         content.to_sql(table_name, engine, schema=CQ_Config.DB_SCHEMA, if_exists="append", index=False)
     except Exception as e:
         _logger.error("{}-每日指标更新出错/{}".format(task_date, repr(e)))
@@ -79,6 +77,7 @@ def update_daily_basic():
     更新每日指标
     """
     pro_api = ts.pro_api(CQ_Config.TUSHARE_TOKEN)
-    fields = "ts_code,trade_date,close,turnover_rate,turnover_rate_f,volume_ratio,pe,pe_ttm,pb,ps,ps_ttm,dv_ratio,dv_ttm,total_share,float_share,free_share,total_mv,circ_mv"
+    fields = "ts_code,trade_date,close,turnover_rate,turnover_rate_f,volume_ratio,pe,pe_ttm,pb,ps,ps_ttm,\
+    dv_ratio,dv_ttm,total_share,float_share,free_share,total_mv,circ_mv"
     pro_api_func = pro_api.daily_basic
     extract_data(TaskEnum.TS更新每日指标, pro_api_func, {"fields": fields}, _parse_data, {}, "每日指标")

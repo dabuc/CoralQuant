@@ -193,7 +193,7 @@ class DailyKTech(Base):
 
 class BS_LaterNPctChg(Base):
     """
-    docstring
+    后期1日，2日，3日，5日，8日，10日，13日，20日，30日，60日，120日，250日涨跌幅
     """
 
     __tablename__ = "bdl_bs_ln_pctchg"
@@ -202,9 +202,15 @@ class BS_LaterNPctChg(Base):
     date = Column("date", Date, nullable=False)  # 交易所行情日期
     close = Column("close", Numeric(18, 4), nullable=False)  # 今收盘价 精度：小数点后4位；单位：人民币元
     pctChg = Column("pctChg", Numeric(18, 6))  # 涨跌幅（百分比）	精度：小数点后6位
+    l1_pctChg = Column("l1_pctChg", Numeric(18, 6))  # 涨跌幅（百分比）	精度：小数点后6位
+    l2_pctChg = Column("l2_pctChg", Numeric(18, 6))  # 涨跌幅（百分比）	精度：小数点后6位
+    l3_pctChg = Column("l3_pctChg", Numeric(18, 6))  # 涨跌幅（百分比）	精度：小数点后6位
     l5_pctChg = Column("l5_pctChg", Numeric(18, 6))  # 涨跌幅（百分比）	精度：小数点后6位
+    l8_pctChg = Column("l8_pctChg", Numeric(18, 6))  # 涨跌幅（百分比）	精度：小数点后6位
     l10_pctChg = Column("l10_pctChg", Numeric(18, 6))  # 涨跌幅（百分比）	精度：小数点后6位
+    l13_pctChg = Column("l13_pctChg", Numeric(18, 6))  # 涨跌幅（百分比）	精度：小数点后6位
     l20_pctChg = Column("l20_pctChg", Numeric(18, 6))  # 涨跌幅（百分比）	精度：小数点后6位
+    l30_pctChg = Column("l30_pctChg", Numeric(18, 6))  # 涨跌幅（百分比）	精度：小数点后6位
     l60_pctChg = Column("l60_pctChg", Numeric(18, 6))  # 涨跌幅（百分比）	精度：小数点后6位
     l120_pctChg = Column("l120_pctChg", Numeric(18, 6))  # 涨跌幅（百分比）	精度：小数点后6位
     l250_pctChg = Column("l250_pctChg", Numeric(18, 6))  # 涨跌幅（百分比）	精度：小数点后6位

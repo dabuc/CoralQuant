@@ -27,7 +27,6 @@ def update_ln_pctChg():
     """更新BS计算指定日期往后N日涨跌幅"""
     click.confirm("正在更新BS计算指定日期往后N日涨跌幅，是否继续？", abort=True)
 
-    ln_pctChg.update_task()
     ln_pctChg.calc_later_n_pctChg()
 
     click.echo("BS计算指定日期往后N日涨跌幅更新完成。")
